@@ -714,6 +714,171 @@ details.deep-dive .dive-body {
   font-size: 0.94rem;
 }
 
+/* Self-check exercises */
+details.self-check {
+  margin: 1.25rem 0 1.65rem;
+  border: 1px solid rgba(45, 76, 124, 0.28);
+  border-left: 3px solid var(--indigo);
+  border-radius: 0 6px 6px 0;
+  background: var(--indigo-soft);
+}
+
+details.self-check summary {
+  padding: 0.72rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.93rem;
+  color: var(--indigo);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+details.self-check summary::-webkit-details-marker {
+  display: none;
+}
+
+details.self-check summary::after {
+  content: "点开核对答案";
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--indigo);
+  white-space: nowrap;
+}
+
+details.self-check[open] summary::after {
+  content: "− 收起答案";
+}
+
+details.self-check .dive-body {
+  padding: 0.45rem 1.1rem 1rem;
+  border-top: 1px solid rgba(45, 76, 124, 0.18);
+  background: var(--bg-card);
+  border-radius: 0 0 6px 0;
+  font-size: 0.93rem;
+}
+
+/* Lesson metadata header (Prereq / Goal / Bottleneck) */
+.lesson-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.9rem 0 1.6rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.lesson-meta-item strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.71rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pine);
+  margin-bottom: 0.2rem;
+}
+
+.lesson-meta-item.warn strong {
+  color: var(--terra);
+}
+
+/* Learning roadmap strip */
+.roadmap-strip {
+  margin: 1.75rem 0 0.5rem;
+  padding: 1rem 1.15rem;
+  background: var(--bg-card);
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+}
+
+.roadmap-title {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+}
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.roadmap-step {
+  display: block;
+  text-decoration: none;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--ink);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.roadmap-step:hover {
+  border-color: var(--pine);
+  background: var(--pine-soft);
+}
+
+.roadmap-step span.r-num {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--pine);
+  margin-bottom: 0.15rem;
+}
+
+.roadmap-step span.r-name {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Structured numbered proof chain */
+.step-flow {
+  counter-reset: flowstep;
+  list-style: none;
+  padding-left: 0;
+  margin: 1.2rem 0 1.5rem;
+}
+
+.step-flow li {
+  counter-increment: flowstep;
+  position: relative;
+  padding: 0.7rem 0.95rem 0.7rem 2.75rem;
+  margin-bottom: 0.65rem;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.step-flow li::before {
+  content: counter(flowstep);
+  position: absolute;
+  left: 0.85rem;
+  top: 0.72rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: var(--pine);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Two-column comparison strip */
 .compare-pair {
   display: grid;
@@ -775,7 +940,9 @@ details.deep-dive .dive-body {
 
   .geo-split,
   .slider-grid,
-  .compare-pair {
+  .compare-pair,
+  .lesson-meta,
+  .roadmap-grid {
     grid-template-columns: 1fr;
   }
 

@@ -19,18 +19,18 @@
     <aside class="toc-rail" id="tocRail" aria-label="文章目录">
       <div class="toc-eyebrow">导读路线 · Reading Path</div>
       <ul class="toc-list">
-        <li><a class="toc-link active" href="#sec-overview"><span class="toc-num">00</span>九篇论文全景与冷静审视</a></li>
-        <li><a class="toc-link" href="#sec-tensor-rank"><span class="toc-num">01</span>线性代数到张量秩</a></li>
-        <li><a class="toc-link" href="#sec-spectrum"><span class="toc-num">02</span>渐近张量谱：给张量定价</a></li>
+        <li><a class="toc-link active" href="#sec-overview"><span class="toc-num">00</span>全景地图与审慎边界</a></li>
+        <li><a class="toc-link" href="#sec-tensor-rank"><span class="toc-num">01</span>2×2 手推：矩阵乘法到张量秩</a></li>
+        <li><a class="toc-link" href="#sec-spectrum"><span class="toc-num">02</span>渐近张量谱：给算力定价</a></li>
         <li><a class="toc-link" href="#sec-euclidean"><span class="toc-num">03</span>核心引擎：欧氏张量几何</a></li>
         <li><a class="toc-link" href="#sec-nine-fourths"><span class="toc-num">04</span>为什么矩阵乘法精确是 9/4？</a></li>
         <li><a class="toc-link" href="#sec-five-siblings"><span class="toc-num">05</span>一把钥匙开六把锁：其余五篇</a></li>
         <li><a class="toc-link" href="#sec-family-380"><span class="toc-num">06</span>另一条战线：线性规划与多胞体</a></li>
-        <li><a class="toc-link" href="#sec-glossary"><span class="toc-num">07</span>工科概念桥接词典与源码索引</a></li>
+        <li><a class="toc-link" href="#sec-glossary"><span class="toc-num">07</span>概念桥接词典与源码索引</a></li>
       </ul>
       <div class="toc-meta">
         依据 <code>openai/math</code> 仓 2026-11-24 原始 LaTeX 源码与 Lean 4 形式化范围文档整理。<br />
-        目标读者：工科高数/线代基础。
+        阅读设计：严格先定义后使用，关键难点可折叠展开。
       </div>
     </aside>
 
@@ -42,7 +42,7 @@
         </div>
         <h1>从工科高数出发，读懂 OpenAI 最新九篇数学论文与「矩阵乘法 $\omega = 9/4$」</h1>
         <p class="subtitle">
-          2026 年 11 月 24 日，OpenAI 在 GitHub 仓库 <code>openai/math</code> 中集中发布了九篇数学预印本，宣称敲定矩阵乘法复杂度极限为精确的 $9/4$、分离 Valiant 代数层级（$\mathsf{VP}\ne\mathsf{VNP}$）、将有限傅里叶变换复杂度钉在 $N\sqrt{\log N}$、证明向日葵猜想并解决 Smale 第九问题。本文直接对照原始 LaTeX 手稿与 Lean 4 验证边界，为你搭起从本科线性代数/微积分直达这批前沿成果的桥梁。
+          2026 年 11 月 24 日，OpenAI 在 GitHub 仓库 <code>openai/math</code> 中集中发布了九篇数学预印本，宣称敲定矩阵乘法复杂度极限为精确的 $9/4$、分离 Valiant 代数层级（$\mathsf{VP}\ne\mathsf{VNP}$）、将有限傅里叶变换复杂度钉在 $N\sqrt{\log N}$、证明向日葵猜想并解决 Smale 第九问题。本文直接对照原始 LaTeX 手稿与 Lean 4 验证边界，按<strong>“先动机 $\to$ 再定义 $\to$ 后手推”</strong>的严格逻辑链，带你从大一《线性代数》逐阶走到这批前沿突破。
         </p>
         <div class="meta-strip">
           <span><strong>核心家族</strong>：Family 379（7篇·欧氏张量几何）+ Family 380（2篇·线性规划与多胞体）</span>
@@ -52,7 +52,7 @@
 
       <!-- SECTION 0: OVERVIEW -->
       <section id="sec-overview">
-        <h2><span class="step-tag">Overview · 全局地图</span>00. 昨天究竟发布了什么？先看全貌与边界</h2>
+        <h2><span class="step-tag">Overview · 全局地图</span>00. 究竟发布了什么？先看全貌、边界与学习路线</h2>
 
         <p>
           网上不少二次解读容易把这次发布混为一谈，甚至误以为“矩阵乘法在 GPU 上马上能加速”。根据 <code>openai/math</code> 仓库中 <code>history.md</code>、<code>CONTENTS.md</code> 以及 9 份预印本的原始 <code>.tex</code> 源码，这次（2026 年 11 月 24 日）的发布实际上分为<strong>两个独立的研究家族</strong>，共 9 篇手稿：
@@ -60,7 +60,7 @@
 
         <ul>
           <li>
-            <strong>Family 379（共 7 篇）——欧氏张量几何及其在复杂度与组合数学中的应用</strong>：这正是你听说的“包括矩阵乘法在内有七篇都和张量有关”。它的第 1 篇论文建立了一套把<strong>张量指标放到欧几里得空间/希尔伯特空间中“几何定价”</strong>的新工具；随后的 6 篇论文用这套工具（及其非正曲率推广），一口气攻克了算术电路复杂度的多座堡垒。
+            <strong>Family 379（共 7 篇）——欧氏张量几何及其在复杂度与组合数学中的应用</strong>：这正是“包括矩阵乘法在内有七篇都和张量有关”的由来。它的第 1 篇论文建立了一套把<strong>张量指标放到欧几里得空间中进行“几何定价”</strong>的新工具；随后的 6 篇论文用这套工具（及其非正曲率推广），一口气攻克了算术电路复杂度与组合数学的多座堡垒。
           </li>
           <li>
             <strong>Family 380（共 2 篇）——强多项式时间线性规划与简单多胞体直径</strong>：这两篇与张量无关，属于最优化与多面体几何方向，分别声称给出了实数域确定性<strong>强多项式时间线性规划算法</strong>（回答 Smale 第九问题），并构造反例否定了<strong>多项式 Hirsch 猜想</strong>。
@@ -70,17 +70,17 @@
         <div class="note-block caution">
           <span class="note-label">冷静审视 · 学术界共识与三个关键边界</span>
           <p>
-            在兴奋地学习其中的数学思想之前，必须先明确以下三个事实（这在 OpenAI 仓库首页 <code>README.md</code> 和学界如 Scott Aaronson 博客、MathOverflow 的讨论中都反复被强调）：
+            在深入数学细节之前，先明确以下三个事实（在 OpenAI 仓库首页 <code>README.md</code> 和学界如 Scott Aaronson 博客、MathOverflow 的讨论中都反复强调）：
           </p>
           <ol>
-            <li><strong>尚未经过人类同行评审</strong>：OpenAI 明确将这些论文定性为内部推理模型生成的“原始研究数据（raw research data）”，而非定稿论文。仓库历史中（例如 2026 年 10 月 7 日）也曾因人类检查出一个符号错误而撤回过 3 篇论文，因此 111 页的 $\omega = 9/4$ 证明仍需数学家数月的严格逐行审查。</li>
+            <li><strong>尚未经过人类同行评审</strong>：OpenAI 明确将这些论文定性为内部推理模型生成的“原始研究数据（raw research data）”，而非定稿论文。仓库历史中（例如 2026 年 10 月 7 日）曾因人类检查出一个符号错误而撤回过 3 篇论文，因此 111 页的 $\omega = 9/4$ 证明仍需数学家数月的严格逐行审查。</li>
             <li><strong>模型限定在“形式算术电路”</strong>：$\omega = 9/4$ 的下界针对的是<strong>形式算术电路</strong>（把输入矩阵元素视为独立代数符号，只允许加减乘除，必须作为有理函数恒等式成立），并不自动等于物理图灵机或位运算模型（Word RAM）下的比特复杂度下界。</li>
             <li><strong>渐近极限 $\ne$ 工程实用</strong>：正如 10 月 2 日上界论文与 11 月 24 日下界论文自己指出的，这里刻画的是 $n \to \infty$ 的渐近指数（隐藏常数极为庞大，即所谓“银河常数”），不会改变目前实际数值计算中矩乘或 FFT 的工程写法。</li>
           </ol>
         </div>
 
         <p>
-          即便保持审慎，这批手稿展示出的<strong>统一数学方法</strong>依然极其惊艳——它把抽象的代数计算复杂度问题，翻译成了直观的<strong>几何长度、三角形周长与凸包宽度</strong>问题。点击下方图谱中的任意一篇论文，可以查看它从源码核对出的真实结论与 Lean 4 机器验证边界：
+          点击下方交互图谱中的任意一篇论文，可以查看它从原始 LaTeX 源码核对出的核心结论与 Lean 4 机器验证边界：
         </p>
 
         <!-- Interactive Widget 1: 9-Paper Atlas -->
@@ -101,261 +101,360 @@
           </div>
           <div class="atlas-detail" id="atlasDetail" aria-live="polite"></div>
         </div>
+
+        <!-- Learning Roadmap -->
+        <div class="roadmap-strip">
+          <div class="roadmap-title">自学路线图 · 每一步只用到上一步和本科高数/线代已定义的工具</div>
+          <div class="roadmap-grid">
+            <a class="roadmap-step" href="#sec-tensor-rank">
+              <span class="r-num">STEP 01 · 代数翻译</span>
+              <span class="r-name">2×2 矩乘 $\to$ 迹、基矩阵 $e_{ij}$、张量秩与“三导线”</span>
+            </a>
+            <a class="roadmap-step" href="#sec-spectrum">
+              <span class="r-num">STEP 02 · 定价尺度</span>
+              <span class="r-name">直和/张量积 $\to$ 谱点公理与展平秩（卡出 $\omega\ge 2$）</span>
+            </a>
+            <a class="roadmap-step" href="#sec-euclidean">
+              <span class="r-num">STEP 03 · 几何突破</span>
+              <span class="r-name">Paper #1：把价格变成欧氏距离与凸包半周长</span>
+            </a>
+            <a class="roadmap-step" href="#sec-nine-fourths">
+              <span class="r-num">STEP 04 · 攻克 9/4</span>
+              <span class="r-name">三叉戟空间 + 压缩反证 $\to$ $\omega = 9/4$ 与长方形公式</span>
+            </a>
+            <a class="roadmap-step" href="#sec-five-siblings">
+              <span class="r-num">STEP 05 · 横扫五题</span>
+              <span class="r-name">Valiant 分离、Permanent、FFT、整数乘与向日葵</span>
+            </a>
+            <a class="roadmap-step" href="#sec-family-380">
+              <span class="r-num">STEP 06 · 优化双篇</span>
+              <span class="r-name">Smale 第九问题（强多项式 LP）与 Hirsch 反例</span>
+            </a>
+          </div>
+        </div>
       </section>
 
       <!-- SECTION 1: LINEAR ALGEBRA TO TENSOR RANK -->
       <section id="sec-tensor-rank">
-        <h2><span class="step-tag">Step 1 · 从 2×2 手推开始，零跳跃</span>01. 从矩阵乘法到「张量秩」：每一步在代数上到底发生了什么？</h2>
+        <h2><span class="step-tag">Step 01 · 从 2×2 手推开始</span>01. 从矩阵乘法到「张量秩」与「三导线」</h2>
 
-        <div class="note-block anchor">
-          <span class="note-label">本科知识锚点</span>
-          <p>在大一《线性代数》里，两个 $2\times 2$ 矩阵 $A = \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix}$ 和 $B = \begin{pmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{pmatrix}$ 相乘得到 $C = AB$，其实就是把以下 4 条等式打包算出来：</p>
-          <div class="math-display">
-            $$c_{11} = a_{11}b_{11} + a_{12}b_{21}, \quad c_{12} = a_{11}b_{12} + a_{12}b_{22}$$
-            $$c_{21} = a_{21}b_{11} + a_{22}b_{21}, \quad c_{22} = a_{21}b_{12} + a_{22}b_{22}$$
+        <div class="lesson-meta">
+          <div class="lesson-meta-item">
+            <strong>前置依赖</strong>
+            <span>大一《线性代数》矩阵乘法、标准基向量与乘法的分配律。</span>
           </div>
-          <p>按定义直接算，每条式子做 2 次乘法，共需 $4 \times 2 = 8$ 次标量乘法。1969 年 Strassen 发现只需 7 次乘法。为了研究“最少几次乘法”，我们必须先解决一个技术问题：<strong>现在输出有 4 个式子（$n\times n$ 时有 $n^2$ 个式子），怎么把它们统一写成一个数学对象，好一起做代数变形？</strong></p>
+          <div class="lesson-meta-item">
+            <strong>本节目标</strong>
+            <span>手推弄懂 $Z$、迹、$e_{ij}$、$\otimes$、张量秩，以及为什么矩乘严格等于“三角形三导线”。</span>
+          </div>
+          <div class="lesson-meta-item warn">
+            <strong>核心难点</strong>
+            <span>适应“把 4 个输出式子打包成一个 3 组变量的多项式”，再把它的系数读成一个 3 维数组。</span>
+          </div>
         </div>
 
-        <h3>第一步：为什么引入辅助矩阵 $Z$？什么是“三线性型”？</h3>
+        <h3>1.1 起点：$2\times 2$ 矩阵乘法与复杂度指数 $\omega$</h3>
         <p>
-          先复习本科一个熟悉的词——<strong>双线性型（Bilinear Form）</strong>。如果一个函数 $f(x, y) = \sum_{u,v} M_{uv} x_u y_v = x^\top M y$，固定 $y$ 它是 $x$ 的一次齐次线性函数，固定 $x$ 它是 $y$ 的一次齐次线性函数，这就叫“双线性型”。它的全部系数刚好排成一个<strong>二维矩阵 $M$</strong>。
-        </p>
-        <p>
-          类似地，如果有三组变量 $x, y, z$，把每一组各挑一个变量乘起来再加权求和：
+          两个 $2\times 2$ 矩阵 $A = \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix}$ 和 $B = \begin{pmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{pmatrix}$ 相乘得到 $C = AB$，本质上是算出以下 4 条等式：
         </p>
         <div class="math-display">
-          $$P(x, y, z) = \sum_{u, v, w} T_{uvw}\, x_u\, y_v\, z_w$$
+          $$c_{11} = a_{11}b_{11} + a_{12}b_{21}, \qquad c_{12} = a_{11}b_{12} + a_{12}b_{22}$$
+          $$c_{21} = a_{21}b_{11} + a_{22}b_{21}, \qquad c_{22} = a_{21}b_{12} + a_{22}b_{22}$$
         </div>
         <p>
-          固定任意两组变量，它对剩下那一组都是“一次齐次线性函数”，这就叫<strong>三线性型（Trilinear Form）</strong>。它的所有系数 $T_{uvw}$ 排成一个三维长方体数组，这就是数学家说的<strong>三阶张量 $T$</strong>。
+          按定义直接算，每条式子做 2 次乘法，共需 $4 \times 2 = 8$ 次标量乘法；对 $n\times n$ 矩阵则需要 $n^3$ 次。1969 年 Volker Strassen 证明：只需 <strong>7 次乘法</strong>（配若干次加减法）就能算出 $c_{11}, c_{12}, c_{21}, c_{22}$。把矩阵不断 $2\times 2$ 分块递归下去，$n\times n$ 矩阵乘法就能降到 $O(n^{\log_2 7}) \approx O(n^{2.807})$ 次运算。
         </p>
         <p>
-          现在看矩阵乘法：输出矩阵 $C = AB$ 有 4 个元素 $c_{11}, c_{12}, c_{21}, c_{22}$。为了把这 4 条独立的等式<strong>无损打包进同一个三线性多项式里</strong>，我们引入 4 个“标记变量（或者叫对偶测试变量）” $z_{11}, z_{12}, z_{21}, z_{22}$，直接定义：
+          人们因此定义<strong>矩阵乘法指数 $\omega$</strong>：如果对任意 $\varepsilon > 0$，两个 $n\times n$ 矩阵相乘都可以用 $O(n^{\tau+\varepsilon})$ 次算术运算完成，所有这种可行 $\tau$ 的下确界就叫 $\omega$。因为输出有 $n^2$ 个元素、定义法要 $n^3$ 次运算，显然 $2 \le \omega \le 3$。
+        </p>
+
+        <h3>1.2 打包 4 条式子：为什么要引入矩阵 $Z$？什么是“三线性型”？</h3>
+        <p>
+          现在我们想研究“怎样用尽可能少的乘法算出 $C=AB$”。但 $C$ 有 4 个分开的式子（$n\times n$ 时有 $n^2$ 个），能不能<strong>把这 4 条独立的输出公式，无损打包成一条单行表达式</strong>？做法非常巧妙，先回忆《线性代数》里的一个概念：
+        </p>
+        <ul>
+          <li><strong>一次型（线性型）</strong>：1 组变量的一次齐次函数，如 $\sum_i c_i x_i$，系数排成 <strong>1 维向量</strong>。</li>
+          <li><strong>双线性型（Bilinear Form）</strong>：2 组变量 $x, y$ 的函数 $x^\top M y = \sum_{u,v} M_{uv} x_u y_v$（固定一组变量时对另一组是线性的），系数排成 <strong>2 维矩阵 $M$</strong>。</li>
+          <li><strong>三线性型（Trilinear Form）</strong>：自然推广到 3 组变量 $x, y, z$，写成 $\sum_{u,v,w} T_{uvw}\, x_u y_v z_w$（固定任意两组，对第三组是一次线性的），系数排成 <strong>3 维数组 $T$</strong>。</li>
+        </ul>
+        <p>
+          为了把 $c_{11}, c_{12}, c_{21}, c_{22}$ 打包进一条三线性型，我们额外引入 4 个纯粹用来“贴标签”的新变量 $z_{11}, z_{12}, z_{21}, z_{22}$，作内积求和：
         </p>
         <div class="math-display">
-          $$P(A, B, Z) \;=\; c_{11} z_{11} + c_{12} z_{12} + c_{21} z_{21} + c_{22} z_{22}$$
+          $$P(A, B, Z) \;:=\; c_{11}z_{11} + c_{12}z_{12} + c_{21}z_{21} + c_{22}z_{22} \;=\; \sum_{i=1}^2 \sum_{k=1}^2 c_{ik} z_{ik}$$
         </div>
         <p>
-          把 $c_{ik}$ 的定义代入展开，这就是一个实实在在、一共 8 项的普通多项式：
+          把前面 $c_{ik}$ 的定义代入展开，这就是一个实实在在、一共 8 项的普通多项式：
         </p>
         <div class="math-display">
           $$\begin{aligned}
           P(A,B,Z) &= (a_{11}b_{11} + a_{12}b_{21})z_{11} + (a_{11}b_{12} + a_{12}b_{22})z_{12} \\
-                   &\quad + (a_{21}b_{11} + a_{22}b_{21})z_{21} + (a_{21}b_{12} + a_{22}b_{22})z_{22}
+                   &\quad + (a_{21}b_{11} + a_{22}b_{21})z_{21} + (a_{21}b_{12} + a_{22}b_{22})z_{22} \\
+                   &= \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k=1}^2 a_{ij}\, b_{jk}\, z_{ik}
           \end{aligned}$$
         </div>
         <p>
-          <strong>$Z$ 没有任何神秘物理意义，它就是一个“索引标签”</strong>：只要你把这个多项式算出来，想读输出矩阵左上角元素 $c_{11}$，只需看 $z_{11}$ 前面的系数；想读 $c_{21}$，只需看 $z_{21}$ 前面的系数！而且如果你把 $z_{ik}$ 顺手记作矩阵 $Z'$ 的转置位置 $z'_{ki} := z_{ik}$，那求的正好是矩阵乘积的迹 $\operatorname{tr}(ABZ') = \sum_{i,j,k} a_{ij} b_{jk} z'_{ki}$，这样指标的下标就会变成极其对称的循环 $ij \to jk \to ki$（这就是为什么论文写 $z_{ki}$ 而不是 $z_{ik}$）。
+          <strong>$Z$ 只是一个标签账本</strong>：在这条多项式里，找出 $z_{12}$ 前面的系数，就读出了 $c_{12}$；找出 $z_{21}$ 的系数，就读出了 $c_{21}$。没有任何信息丢失！
+        </p>
+        <p>
+          为什么论文里还常写 $\operatorname{tr}(ABZ')$ 以及把 $z_{ik}$ 写成 $z'_{ki}$？回忆线代：矩阵的<strong>迹（Trace）</strong> $\operatorname{tr}(M)$ 就是对角线元素之和 $\sum_i M_{ii}$。如果把 $z_{ik}$ 放到辅助矩阵 $Z'$ 的转置位置（令 $z'_{ki} := z_{ik}$），那么矩阵乘积 $ABZ'$ 的对角线之和正好等于：
+        </p>
+        <div class="math-display">
+          $$\operatorname{tr}(ABZ') = \sum_{i=1}^n (ABZ')_{ii} = \sum_{i=1}^n \sum_{k=1}^n (AB)_{ik}\, z'_{ki} = \sum_{i,j,k=1}^n a_{ij}\, b_{jk}\, z'_{ki}$$
+        </div>
+        <p>
+          这样做纯粹是为了下标美观对称：<strong>$ij \to jk \to ki$ 形成首尾相连的循环</strong>。而每一项都是“一个 $a \times$ 一个 $b \times$ 一个 $z'$”，因此 $P$ 就是一个标准的<strong>三线性型</strong>。
         </p>
 
-        <h3>第二步：式子里的 $e_{ij}$ 和 $\otimes$ 到底是什么意思？</h3>
+        <h3>1.3 从多项式到三维数组：正式定义基矩阵 $e_{ij}$ 与外积 $\otimes$</h3>
         <p>
-          在 $2\times 2$ 矩阵空间里，有 4 个最简单的<strong>标准基矩阵</strong>，每个矩阵只在 $(i,j)$ 位置写一个 $1$，其余三个位置全写 $0$：
+          现在我们把上面这个多项式的系数搬进一个“三维数组”里。先准备 $2\times 2$ 矩阵空间的 4 个<strong>标准基矩阵</strong>——记作 $e_{11}, e_{12}, e_{21}, e_{22}$，规则很简单：<strong>$e_{ij}$ 就是第 $(i,j)$ 格填 $1$、其余三格全填 $0$ 的矩阵</strong>：
         </p>
         <div class="math-display">
           $$e_{11} = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}, \quad e_{12} = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}, \quad e_{21} = \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}, \quad e_{22} = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}$$
         </div>
         <p>
-          回忆本科线性代数：如果 $u$ 是 4 维列向量、$v$ 是 4 维列向量，那么 $u \otimes v$（在二维情况下就是外积 $u v^\top$）会拼成一个 $4\times 4$ 矩阵，第 $(p,q)$ 格等于 $u_p v_q$。特别地，$e_p \otimes e_q$ 就是“只在第 $(p,q)$ 格为 $1$、其余全为 $0$”的矩阵。
+          任何 $2\times 2$ 矩阵 $A$ 都能唯一拆成 $A = a_{11}e_{11} + a_{12}e_{12} + a_{21}e_{21} + a_{22}e_{22}$。接下来，回忆线代里两个向量的<strong>外积（记作 $\otimes$）</strong>：若 $u, v$ 都是 4 维列向量，则 $u \otimes v$（即矩阵 $u v^\top$）是一个 $4\times 4$ 表格，第 $(p,q)$ 格等于 $u_p v_q$。特别地，$e_p \otimes e_q$ 就是“只在第 $(p,q)$ 格为 $1$、其余全 $0$”的二维表。
         </p>
         <p>
-          完全一样！把 3 个基矩阵 $e_{ij}, e_{jk}, e_{ki}$ 用 $\otimes$ 连起来：
+          把这个写法顺延到三个因子：把 $e_{ij}, e_{jk}, e_{ki}$ 用 $\otimes$ 乘在一起，写成
         </p>
         <div class="math-display">
           $$e_{ij} \otimes e_{jk} \otimes e_{ki}$$
         </div>
         <p>
-          这代表一个 $4 \times 4 \times 4$ 的三维数组（共 64 个格子），<strong>仅仅在坐标为 $\bigl((i,j),\,(j,k),\,(k,i)\bigr)$ 的那一个格子里填 $1$，其余 63 个格子全填 $0$</strong>！
-          它和刚才的多项式单项式 $a_{ij} b_{jk} z'_{ki}$ 是一一对应的——多项式里出现哪几项，三维数组就在那几个坐标上填 $1$。因此：
+          它就代表一个 $4 \times 4 \times 4$ 的三维数组（共 64 个格子），<strong>仅仅在三维坐标为 $\bigl((i,j),\,(j,k),\,(k,i)\bigr)$ 的那 1 个格子里填 $1$，其余 63 个格子全填 $0$</strong>——它与多项式里的单项式 $a_{ij}b_{jk}z'_{ki}$ 是一一对应的！于是，把多项式 $P(A,B,Z')$ 的 8 个单项式全部加起来，对应的三维系数数组（称为<strong>矩阵乘法张量 $T_2$</strong>，一般地为 $T_n$）就是：
         </p>
         <div class="math-display">
-          $$T_2 = \sum_{i,j,k \in \{1,2\}} e_{ij} \otimes e_{jk} \otimes e_{ki}$$
+          $$T_n = \sum_{i=1}^n \sum_{j=1}^n \sum_{k=1}^n e_{ij} \otimes e_{jk} \otimes e_{ki}$$
         </div>
         <p>
-          说的不过是“<strong>一个 $4\times 4\times 4$ 的三维数组，在 8 个合法坐标上写 $1$，其余 56 个坐标写 $0$</strong>”。（一般地，$T_n$ 是 $n^2 \times n^2 \times n^2$ 维三维数组中、有 $n^3$ 个 $1$ 的稀疏 0-1 数组。）
+          请确认此时已没有任何神秘符号：$T_2$ 不过是“一个 $4\times 4\times 4$ 的三维数组，在 8 个合法坐标上写 $1$，其余 56 个坐标写 $0$”。
         </p>
 
-        <h3>第三步：手推验证——为什么 Strassen 的 7 次乘法就是“张量秩 = 7”？</h3>
+        <h3>1.4 张量秩 $R(T)$：为什么 Strassen 7 次乘法就是“拆成 7 块外积之和”？</h3>
         <p>
-          如果按定义展开，上面 $P(A,B,Z)$ 有 8 个单项式，对应三维数组写成 8 个“单点阵”之和。现在看一个具体操作——比如 Strassen 著名的第一项乘法 $M_1 = (a_{11}+a_{22})(b_{11}+b_{22})$，它同时加到了 $c_{11}$ 和 $c_{22}$ 上。在带标签 $Z$ 的多项式里，这一项的贡献恰好能<strong>因式分解成三个一次式的乘积</strong>：
+          如果直接照抄上面定义，$T_2$ 写成了 8 个 $e_{ij}\otimes e_{jk}\otimes e_{ki}$ 之和，对应 8 次乘法。为什么 Strassen 能省掉 1 次？看他的第一项乘法 $M_1 = (a_{11}+a_{22})(b_{11}+b_{22})$：在 $C=AB$ 里，它同时被加进了 $c_{11}$ 和 $c_{22}$。在我们的账本多项式 $P(A,B,Z)$ 中，它对应的贡献恰好合并成<strong>一个因式分解乘积</strong>：
         </p>
         <div class="math-display">
-          $$(a_{11} + a_{22})\,(b_{11} + b_{22})\,(z_{11} + z_{22})$$
+          $$M_1(z_{11}+z_{22}) = (a_{11} + a_{22})\,(b_{11} + b_{22})\,(z_{11} + z_{22})$$
         </div>
         <p>
-          写成三维数组语言，它对应唯一一个“三方外积”：
+          用刚才定义的基矩阵和 $\otimes$ 来写，这一项在三维数组里就是唯一一个三方外积块（即只用 1 次乘法）：
         </p>
         <div class="math-display">
           $$(e_{11} + e_{22}) \otimes (e_{11} + e_{22}) \otimes (e_{11} + e_{22})$$
         </div>
         <p>
-          请注意它的结构：<strong>左边只混用 $A$ 的元素，中间只混用 $B$ 的元素，右边只决定结果加到 $C$ 的哪些位置</strong>！Strassen 找出了 7 组这样的括号：
+          Strassen 算法整套配方，等价于把 8 项的 $P(A,B,Z)$ 重写成 <strong>7 个这种“三括号相乘”之和</strong>；写成三维数组，就是把 $T_2$ 拆成 7 个外积项 $\sum_{\ell=1}^7 u_\ell \otimes v_\ell \otimes w_\ell$ 之和。数学上定义：
+        </p>
+        <ul>
+          <li><strong>张量秩 $R(T)$</strong>：把三维数组 $T$ 写成 $u_\ell \otimes v_\ell \otimes w_\ell$ 之和所需的最少项数 $r$。它精确等于双线性算法所需的<strong>最少标量乘法次数</strong>（所以 $R(T_2) \le 7$）。</li>
+          <li><strong>对角模板 $\Delta(r)$</strong>：记 $\Delta(r) := \sum_{\ell=1}^r e_\ell \otimes e_\ell \otimes e_\ell$，对应多项式 $\sum_{\ell=1}^r \tilde{a}_\ell \tilde{b}_\ell \tilde{z}_\ell$，意思是“<strong>做 $r$ 次互相独立的乘法</strong>”。一个 $r$ 次乘法的算法，本质上就是先对 $A$ 的变量做线性组合得到 $\tilde{a}_\ell$、对 $B$ 做线性组合得到 $\tilde{b}_\ell$、对 $Z$ 做线性组合得到 $\tilde{z}_\ell$，把 $\Delta(r)$ 变换成 $T_n$——这种在三组变量各自内部做线性替换的关系记作 $T_n \le \Delta(r)$。</li>
+        </ul>
+
+        <details class="deep-dive">
+          <summary>进阶选读：如果电路允许用除法和任意加减复用（一般算术电路），张量秩还能管住它吗？</summary>
+          <div class="dive-body">
+            <p>
+              会的，只差一个常数 $2$。在 9/4 论文的引理 <code>lem:bilinearize</code> 中，作者引入满足 $u^2 = v^2 = 0$ 的对偶数一阶扰动，把 $A + uX, B + vY$ 代入任意使用了 $q$ 个非标量乘除门的算术电路。展开并提取 $uv$ 交叉项的系数时，每个乘法门 $(a_{10}b_{01}+a_{01}b_{10})$ 或除法门至多产生 $2$ 个新的线性型乘积，因此 $\operatorname{rank}_{\overline{F}}(T_n) \le 2q$。反过来，任何一般算术电路至少需要 $\lceil R(T_n)/2 \rceil$ 个非标量乘除门（这就是结论里 $n^{9/4}/2$ 中除以 $2$ 的严格来源）。
+            </p>
+          </div>
+        </details>
+
+        <h3>1.5 为什么会变成“三个站点 + 三条导线”？（严格代数分解，不是比喻）</h3>
+        <p>
+          带着上面刚定义好的全部符号，我们现在可以回答最关键的问题：论文为什么总在讲“三个站点”和“导线”？
+        </p>
+        <p>
+          <strong>第一，“三个站点 $A, B, C$”是什么？</strong> 注意到刚才我们要求：只能把 $A$ 自己的元素线性组合，把 $B$ 自己的元素线性组合，把 $Z'$ 自己的元素线性组合，<strong>绝不能把 $a_{11}$ 和 $b_{11}$ 加在一起</strong>。为了直观表达这种“三组变量物理隔离、只能各自内部做线性变换”的代数约束，论文把三组指标分别摆在三个<strong>站点（Sites）</strong> $A, B, C$ 上。
+        </p>
+        <p>
+          <strong>第二，“导线（Wire）”在代数上是什么？</strong> 它是线性代数里最基本的 $n\times n$ <strong>单位矩阵</strong>：
         </p>
         <div class="math-display">
-          $$P(A, B, Z) = \sum_{\ell=1}^{7} \Big(\sum_{i,j} \alpha_{ij}^{(\ell)} a_{ij}\Big) \Big(\sum_{j,k} \beta_{jk}^{(\ell)} b_{jk}\Big) \Big(\sum_{i,k} \gamma_{ik}^{(\ell)} z_{ik}\Big)$$
+          $$I_n = \sum_{j=1}^n e_j \otimes e_j \qquad \Longleftrightarrow \qquad \text{双线性型 } \sum_{j=1}^n x_j y_j$$
         </div>
         <p>
-          我们把“<strong>最多只允许写成几个 $u_\ell \otimes v_\ell \otimes w_\ell$ 之和</strong>”定义为张量秩 $R(T)$。把三维数组拆成 7 个这种可因式分解的块，与设计一个只需 7 次乘法的双线性矩阵乘法算法，<strong>在数学上是同一件事的两个写法</strong>，所以 $R(T_2) \le 7$（事实上可以严格证明正好等于 7）。
+          为什么叫它“导线”？① 看矩阵元：只有当两端选的下标完全相等（$j_{\text{左}} = j_{\text{右}}$）时元素才为 $1$，不等时全为 $0$，它强行把两端的指标绑定同步；② 做向量乘法 $I_n v = v$，它原封不动把 $n$ 维信息从一端传递到另一端。
         </p>
         <p>
-          而论文里常出现的记号 $\Delta_{\{A,B,C\}}(r) = \sum_{\ell=1}^r e_\ell \otimes e_\ell \otimes e_\ell$，对应多项式就是 $\sum_{\ell=1}^r \tilde{a}_\ell \tilde{b}_\ell \tilde{z}_\ell$——即“<strong>做 $r$ 次完全独立互不相干的乘法</strong>”。只要我们在 $A$ 处做线性替换 $\tilde{a}_\ell \leftarrow \sum \alpha_{ij}^{(\ell)} a_{ij}$、在 $B$ 处做 $\tilde{b}_\ell \leftarrow \sum \beta_{jk}^{(\ell)} b_{jk}$、在 $C$ 处做对应线性映射，就能把这 $r$ 次独立乘法变成 $T_n$。这就是为什么论文把算法等价于“局部线性映射（Restriction）把 $\Delta(r)$ 变成 $T_n$”，记作 $T_n \le \Delta_{\{A,B,C\}}(r)$。
-        </p>
-
-        <h3>第四步：为什么偏要理解成“三个站点”和“三条导线”？（不是玄学比喻，是严格代数分解）</h3>
-        <p>
-          很多工科同学读到这里会卡住：“行，三维数组我懂了，但论文里动不动就说把张量放在‘三个站点（Sites）’、边上是‘导线（Wire）’，这到底有什么严格意义？”
-        </p>
-        <p>
-          <strong>第一，为什么叫“三个站点 $A, B, C$”？</strong> 因为做张量秩分解时，算法允许你把 $A$ 里面的元素任意加减组合（$a_{11}+a_{22}$），把 $B$ 里面的元素任意加减组合（$b_{11}+b_{22}$），但<strong>绝对不允许把 $a_{11}$ 和 $b_{11}$ 加在一起做线性替换</strong>（如果允许混合，乘法就变成平方公式 $(a+b)^2 - a^2 - b^2$ 乱套了）。把 $A, B, C$ 想象成物理隔离的三张桌子（三个站点），恰好用几何隔离强制执行了那条代数规则：“<strong>每个站点内部只能做自己的线性变换（Local Linear Map）</strong>”。
-        </p>
-        <p>
-          <strong>第二，什么叫“导线（Wire）”？</strong> 在线性代数里，最简单的线性算子是单位矩阵 $I_n = \sum_{j=1}^n e_j \otimes e_j$。把它当成双线性型，就是 $\sum_{j=1}^n x_j y_j$。为什么论文管 $I_n$ 叫“一条容量为 $n$ 的导线”？看两件事：
-        </p>
-        <ol>
-          <li>当作系数矩阵看：只有当两边选的下标完全相等（$j_{\text{左}} = j_{\text{右}}$）时，系数才是 $1$，否则全为 $0$——它强制让两个站点对齐同一个 $n$ 选 $1$ 的指标；</li>
-          <li>当作缩并运算看：把一根导线接在某个变量上求和 $\sum_{j=1}^n x_j (\delta_{j, j'})$，结果原封不动输出 $x_{j'}$——它把信息从一端无损搬运到另一端，就像电线一样。</li>
-        </ol>
-        <p>
-          <strong>第三，手推一遍那个“三角形三边分解公式”！</strong> 把基矩阵 $e_{ij}^{(A)}$ 进一步看成行向量与列向量的外积 $e_i^{(A_1)} \otimes e_j^{(A_2)}$（同样 $e_{jk}^{(B)} = e_j^{(B_1)} \otimes e_k^{(B_2)}$，$e_{ki}^{(C)} = e_k^{(C_1)} \otimes e_i^{(C_2)}$）。现在看原封不动的三重求和：
+          <strong>第三，手推一遍“三角形三导线分解”！</strong> 刚才我们在 1.3 节定义过基矩阵 $e_{ij}^{(A)}$。其实第 $i$ 行第 $j$ 列的基矩阵本身就是第 $i$ 个行基向量与第 $j$ 个列基向量的外积：$e_{ij}^{(A)} = e_i^{(A_1)} \otimes e_j^{(A_2)}$（同样 $e_{jk}^{(B)} = e_j^{(B_1)} \otimes e_k^{(B_2)}$，$e_{ki}^{(C)} = e_k^{(C_1)} \otimes e_i^{(C_2)}$）。代入 1.3 节推出的 $T_n$ 公式：
         </p>
         <div class="math-display">
           $$T_n = \sum_{i=1}^n \sum_{j=1}^n \sum_{k=1}^n \bigl(e_i^{(A_1)} \otimes e_j^{(A_2)}\bigr) \otimes \bigl(e_j^{(B_1)} \otimes e_k^{(B_2)}\bigr) \otimes \bigl(e_k^{(C_1)} \otimes e_i^{(C_2)}\bigr)$$
         </div>
         <p>
-          中学数学教过我们乘法分配律：$\sum_i \sum_j \sum_k (u_i v_j w_k) = (\sum_i u_i)(\sum_j v_j)(\sum_k w_k)$！只要把带相同下标 $i, j, k$ 的因子各自归类并合到一起（重新排一下张量积括号顺序），上面的三重求和<strong>严格地、不带任何比喻地</strong>因式分解成三块完全独立的东西：
+          按照小学到中学都会的<strong>乘法分配律</strong> $\sum_i \sum_j \sum_k (u_i v_j w_k) = (\sum_i u_i)(\sum_j v_j)(\sum_k w_k)$，把各自只带 $i$、只带 $j$、只带 $k$ 的因子合并提取出来（仅重排乘法顺序）：
         </p>
         <div class="math-display">
-          $$T_n \;\cong\; \underbrace{\Big(\sum_{i=1}^n e_i^{(A_1)} \otimes e_i^{(C_2)}\Big)}_{\text{连接 }A\text{ 与 }C\text{ 的单位阵 } I_n} \;\otimes\; \underbrace{\Big(\sum_{j=1}^n e_j^{(A_2)} \otimes e_j^{(B_1)}\Big)}_{\text{连接 }A\text{ 与 }B\text{ 的单位阵 } I_n} \;\otimes\; \underbrace{\Big(\sum_{k=1}^n e_k^{(B_2)} \otimes e_k^{(C_1)}\Big)}_{\text{连接 }B\text{ 与 }C\text{ 的单位阵 } I_n}$$
+          $$T_n \;\cong\; \underbrace{\Big(\sum_{i=1}^n e_i^{(A_1)} \otimes e_i^{(C_2)}\Big)}_{\text{连接 }A, C\text{ 的单位阵 } I_n} \;\otimes\; \underbrace{\Big(\sum_{j=1}^n e_j^{(A_2)} \otimes e_j^{(B_1)}\Big)}_{\text{连接 }A, B\text{ 的单位阵 } I_n} \;\otimes\; \underbrace{\Big(\sum_{k=1}^n e_k^{(B_2)} \otimes e_k^{(C_1)}\Big)}_{\text{连接 }B, C\text{ 的单位阵 } I_n}$$
         </div>
         <p>
-          在 $n=2$ 的小例子里检验一下：$(e_1\otimes e_1 + e_2\otimes e_2)_{AC} \otimes (e_1\otimes e_1 + e_2\otimes e_2)_{AB} \otimes (e_1\otimes e_1 + e_2\otimes e_2)_{BC}$ 展开括号一共 $2\times 2\times 2 = 8$ 项，每一项 $(i, j, k)$ 正好选出 $e_{ij}^{(A)}\otimes e_{jk}^{(B)} \otimes e_{ki}^{(C)}$！
-        </p>
-        <p>
-          至此你已经彻底打通了核心翻译：<strong>矩阵乘法张量 $T_n$，在代数上真真切切就是三个两两独立单位阵 $I_n$ 的张量积——对应三角形三条边上各自拉一根 $n$ 维导线；而一次求矩阵乘法的算法，就是试图用一根同时贯穿三点的“总公共总线 $\Delta(r)$”去替代这三条两两导线！</strong>
+          结论水落石出：<strong>矩阵乘法张量 $T_n$，在代数上严格等于“三角形三条边各自拉一根 $n$ 维单位阵导线 $I_n$”的张量积；而一个使用 $r$ 次乘法的矩阵乘法算法，就是用一根三方共享总标签 $\Delta_{\{A,B,C\}}(r)$ 去变出这三条导线！</strong>
         </p>
 
-        <details class="deep-dive">
-          <summary>加减乘除都能用的“一般算术电路”，怎么也受限于张量秩？</summary>
+        <details class="self-check">
+          <summary>暂停自测：动手展开 $n=2$ 的三括号乘积，验证它正好还原出 $T_2$</summary>
           <div class="dive-body">
-            <p>
-              工科同学可能会问：上面只讨论了“先线性组合、再乘一次、再线性组合”的双线性算法，万一有个极其诡异的电路先算乘法再加减再做除法（比如利用除法或者高次多项式中间消元），能不能打破张量秩的限制？
-            </p>
-            <p>
-              在 9/4 论文的引理 <code>lem:bilinearize</code>（双线性化）中，作者用了一个非常漂亮的一阶泰勒/对偶数技巧（引入满足 $u^2 = v^2 = 0$ 的无穷小扰动 $A + uX, B + vY$）：任何使用 $q$ 个非标量乘法或除法门的电路，展开其 $uv$ 交叉项系数时，每个乘法门 $(a_{10}b_{01} + a_{01}b_{10})$ 或除法门最多贡献 2 个新的线性型乘积！因此 $\operatorname{rank}_{\overline{F}}(T_n) \le 2q$，反过来立即得到<strong>任意加减乘除电路至少需要 $\lceil R(T_n)/2 \rceil$ 个非标量乘除门</strong>（这就是为什么论文结论里会出现 $n^{9/4}/2$ 中的那个 $/2$）。
-            </p>
+            <p><strong>练习</strong>：写出 $(e_1^{(A_1)}\otimes e_1^{(C_2)} + e_2^{(A_1)}\otimes e_2^{(C_2)}) \otimes (e_1^{(A_2)}\otimes e_1^{(B_1)} + e_2^{(A_2)}\otimes e_2^{(B_1)}) \otimes (e_1^{(B_2)}\otimes e_1^{(C_1)} + e_2^{(B_2)}\otimes e_2^{(C_1)})$ 展开后对应 $(i,j,k) = (1,2,1)$ 的那一项，看看是不是 $e_{12}^{(A)} \otimes e_{21}^{(B)} \otimes e_{11}^{(C)}$？</p>
+            <p><strong>核对</strong>：第一个括号取第 $1$ 项 $e_1^{(A_1)}\otimes e_1^{(C_2)}$，第二个括号取第 $2$ 项 $e_2^{(A_2)}\otimes e_2^{(B_1)}$，第三个括号取第 $1$ 项 $e_1^{(B_2)}\otimes e_1^{(C_1)}$。按站点 $A, B, C$ 重新归类：站点 $A$ 拿到 $e_1^{(A_1)}\otimes e_2^{(A_2)} = e_{12}^{(A)}$，站点 $B$ 拿到 $e_2^{(B_1)}\otimes e_1^{(B_2)} = e_{21}^{(B)}$，站点 $C$ 拿到 $e_1^{(C_1)}\otimes e_1^{(C_2)} = e_{11}^{(C)}$——完全吻合！一共 $2\times 2\times 2 = 8$ 项，一项不差。</p>
           </div>
         </details>
       </section>
 
       <!-- SECTION 2: ASYMPTOTIC SPECTRUM OF TENSORS -->
       <section id="sec-spectrum">
-        <h2><span class="step-tag">Step 2 · 给张量“定价”的经济学</span>02. Strassen 渐近谱：用不等式给算力“称重”</h2>
+        <h2><span class="step-tag">Step 02 · 给算力发明“货币尺度”</span>02. Strassen 渐近谱：怎么用三条公理卡死乘法次数下界？</h2>
 
-        <div class="note-block anchor">
-          <span class="note-label">本科知识锚点</span>
-          <p>回忆线代里关于矩阵的两个基本性质：① 分块对角阵 $\operatorname{diag}(M_1, M_2)$ 的秩等于 $\operatorname{rank}(M_1) + \operatorname{rank}(M_2)$；② Kronecker 积（克罗内克积）$M_1 \otimes M_2$ 的秩等于 $\operatorname{rank}(M_1) \cdot \operatorname{rank}(M_2)$；③ 左乘右乘矩阵 $PMQ$ 只会让秩减小或不变。矩阵秩同时满足“块直和可加、张量积可乘、线性映射单调不增”。</p>
+        <div class="lesson-meta">
+          <div class="lesson-meta-item">
+            <strong>前置依赖</strong>
+            <span>Step 01 的 $T_n, \Delta(r), I_n$ 与归约关系 $T_n \le \Delta(r)$；本科矩阵的秩。</span>
+          </div>
+          <div class="lesson-meta-item">
+            <strong>本节目标</strong>
+            <span>看懂张量的直和 $\oplus$ 与张量积 $\otimes$，以及谱点如何把“代数存在性”转化成“实数大小比较”。</span>
+          </div>
+          <div class="lesson-meta-item warn">
+            <strong>核心难点</strong>
+            <span>为什么三维张量不像矩阵那样可直接算秩，而必须引入满足三条公理的“谱点函数 $F$”。</span>
+          </div>
         </div>
 
         <p>
-          对于二维矩阵，求它的最小“乘法分解”（矩阵秩）有高斯消元法，多项式时间就能算准。但到了三维及更高维张量，张量秩既难计算，甚至<strong>不满足直和可加性</strong>，也不再轻易满足张量积可乘性。那怎么证明一个张量 $T$ 至少需要多少次乘法（或者证明 $T$ 无法用比它更小的电路构造出来）呢？
+          在 Step 01 我们得到了一条核心不等式：若存在用 $r$ 次乘法算出 $n\times n$ 矩阵乘法的算法，则
+          $$T_n \;\le\; \Delta_{\{A,B,C\}}(r)$$
+          问题在于：对于二维矩阵，求最小分解次数（矩阵秩）只需高斯消元；但对于三维张量，求张量秩 $R(T)$ 是 NP-hard 的，而且张量秩连“各自算再相加”（直和）和“分块递归放大”（张量积）都不遵守等式。那怎么证明 $r$ 不可能太小呢？
         </p>
 
+        <h3>2.1 先搞清张量的两种组合运算：直和 $\oplus$ 与张量积 $\otimes$</h3>
         <p>
-          1988 年，Strassen 提出了一个天才的思路：<strong>如果我们直接去给张量定义一套“汇率 / 价格体系”呢？</strong>
+          假设你手里有两个独立张量 $X$ 和 $Y$（例如分别代表两个计算任务），它们有两种组合方式，正好对应线性代数里的分块矩阵与 Kronecker 积：
+        </p>
+        <ul>
+          <li><strong>直和 $X \oplus Y$（并行执行）</strong>：在每个站点把 $X$ 的变量和 $Y$ 的变量摆在互不重叠的独立下标区间里（就像把两个矩阵拼成分块对角阵 $\operatorname{diag}(M_1, M_2)$）。直觉：<strong>同时做两个互不干扰的独立任务</strong>。</li>
+          <li><strong>张量积 $X \otimes Y$（分块递归放大）</strong>：把每个站点的变量下标配成有序数对 $(u, u')$。对于矩阵乘法张量，自己和自己做一次张量积会得到 $T_n \otimes T_m \cong T_{nm}$（例如 $T_2 \otimes T_2 \cong T_4$）——这正是<strong>分块矩阵递归乘法</strong>的代数本质！</li>
+        </ul>
+
+        <h3>2.2 Strassen 的天才点子：找一把遵守三条公理的“价格尺子”</h3>
+        <p>
+          1988 年 Strassen 提出：既然 $R(T)$ 太难算，我们干脆寻找能够把每个张量 $T$ 映射成一个非负实数 $F(T) \ge 0$（标准化 $F(0)=0, F(1)=1$）的评价函数，只要求它像二维矩阵的秩一样，遵守以下三条“货币汇率公理”：
         </p>
 
         <div class="note-block theorem">
-          <span class="note-label">核心概念 · 谱点（Spectral Point）与价格（Price）</span>
-          <p>
-            假设我们在有限个站点之间考虑所有张量。一个合法的<strong>谱点</strong> $F$ 是给每个张量分配一个非负实数 $F(T) \ge 0$ 的函数（标准化 $F(0)=0, F(1)=1$），只要它同时满足三条极其自然的公理：
-          </p>
+          <span class="note-label">核心定义 · 谱点（Spectral Point）与价格（Price）</span>
           <ol>
-            <li><strong>局部线性映射不增（Restriction Monotone）</strong>：如果在每个站点各自做线性变换能把张量 $Y$ 变成 $X$（记作 $X \le Y$），那么 $F(X) \le F(Y)$。（白话：加工不会凭空多出算力价值。）</li>
-            <li><strong>直和可加（Additivity）</strong>：$F(X \oplus Y) = F(X) + F(Y)$。（两个互不干扰的并行任务打包在一起，价值直接相加。）</li>
-            <li><strong>张量积可乘（Multiplicativity）</strong>：$F(X \otimes Y) = F(X) \cdot F(Y)$。（像把问题规模平方一样递归嵌套时，价值呈幂次相乘。）</li>
+            <li><strong>本地线性映射不增（Restriction Monotone）</strong>：若在每个站点各自做线性变换能把 $Y$ 变成 $X$（$X \le Y$），则 $F(X) \le F(Y)$。（加工不增加总价值。）</li>
+            <li><strong>直和可加（Additivity）</strong>：$F(X \oplus Y) = F(X) + F(Y)$。（并行两件任务，价值直接相加。）</li>
+            <li><strong>张量积可乘（Multiplicativity）</strong>：$F(X \otimes Y) = F(X) \cdot F(Y)$。（分块递归放大规模时，价值按幂次相乘。）</li>
           </ol>
           <p>
-            取以 2 为底的对数，定义张量的<strong>价格（Price）</strong>为 $H(T) = c \cdot \log_2 F(T)$（其中 $c > 0$ 是尺度常数）。取对数后，“张量积可乘”立刻变成“<strong>张量积可加</strong>”：$H(X \otimes Y) = H(X) + H(Y)$！
+            这样的函数 $F$ 就叫做 Strassen 渐近谱里的一个<strong>谱点</strong>。取以 2 为底的对数（并乘上一个正尺度常数 $c>0$），定义张量的<strong>价格（Price）</strong>：
+            $$H(T) := c \log_2 F(T)$$
+            取对数后，“张量积可乘”立刻变成“<strong>张量积可加</strong>”：$H(X \otimes Y) = H(X) + H(Y)$！以后三角形三条独立导线的张量积 $T_n = I_n^{(AC)} \otimes I_n^{(AB)} \otimes I_n^{(BC)}$ 的总价格，直接就是三条边价格的<strong>代数和</strong>！
           </p>
         </div>
 
-        <h3>为什么“价格”能直接卡死复杂度下界？</h3>
+        <h3>2.3 手算一个真实存在的谱点：展平矩阵秩 $F_{A|BC}$（以及它的极限）</h3>
         <p>
-          回到刚才的矩阵乘法：如果我们想用 $r$ 次乘法算出 $T_n$，在代数上就意味着：
-        </p>
-        <div class="math-display">
-          $$T_n \;\le\; \Delta_{\{A,B,C\}}(r) \qquad \Longrightarrow \qquad H(T_n) \;\le\; H\bigl(\Delta_{\{A,B,C\}}(r)\bigr)$$
-        </div>
-        <p>
-          左边 $T_n$ 是三条边长为 $n$ 的导线拼起来的；右边 $\Delta_{\{A,B,C\}}(r)$ 是三方共享一个 $r$ 选 1 标签（相当于 $\log_2 r$ 个共享比特）。只要我们能找到一个合法的谱点（价格系统 $H$），使得：
+          空谈公理太抽象，我们立刻用 Step 01 的 $T_2$ 动手构造并验证一个真正合法的谱点！方法叫<strong>展平（Flattening）</strong>：把三个站点硬切一刀分成两群——比如站点 $A$ 站左边，站点 $(B, C)$ 合并站右边：
         </p>
         <ul>
-          <li>每条边传输 1 比特的价格都是 $1$，那么左边总价 $H(T_n) = 3 \log_2 n$（或按一般比例 $L_{\text{总}}\log_2 n$）；</li>
-          <li>右边三方共享 1 比特的“批发价”是 $D$，那么右边总价就是 $D \log_2 r$。</li>
+          <li>在 $T_2 = \sum_{i,j,k\in\{1,2\}} e_{ij}^{(A)} \otimes (e_{jk}^{(B)} \otimes e_{ki}^{(C)})$ 中，左边有 4 个基坐标，右边有 $4\times 4 = 16$ 对基坐标，于是 $T_2$ 展平成一个普通的 <strong>$4\times 16$ 二维矩阵</strong> $M_{A|BC}$。</li>
+          <li>观察这 4 行：第 $(i,j)$ 行仅仅在满足“第一段等于 $j$、第二段末尾等于 $i$”的列上填 $1$。因为不同 $(i,j)$ 对应的非零列完全不重叠，这 4 行线性无关，所以这个矩阵的秩精确等于 $4 = 2^2$！（对任意 $n$，展平秩等于 $n^2$。）</li>
         </ul>
         <p>
-          于是立刻白白白捡到一个铁打的不等式：$3 \log_2 n \le D \log_2 r \implies r \ge n^{3/D}$！
+          令 $F_{A|BC}(T) := \operatorname{rank}(M_{A|BC})$。按本科线代性质：分块对角阵秩相加（直和可加）、Kronecker 积秩相乘（张量积可乘）、左右乘矩阵秩不增（局部线性映射不增）——<strong>三条公理全部完美满足！</strong>
         </p>
         <p>
-          <strong>痛点在哪里？怎样手动算一次经典“谱点”？</strong>几十年来，数学家手里最常用的一类现成谱点叫做<strong>展平矩阵秩（Flattening Rank）</strong>。不妨直接在 $T_2$ 上动手算一遍：把站点 $A$ 的 4 个基坐标 $\{e_{11}, e_{12}, e_{21}, e_{22}\}$ 当作矩阵的行，把站点 $(B, C)$ 凑成的 $4\times 4 = 16$ 对坐标当作矩阵的列。因为 $T_2 = \sum_{i,j,k} e_{ij} \otimes (e_{jk}\otimes e_{ki})$ 中，每一行 $(i,j)$ 对应的非零列 $(jk, ki)$ 互不重叠，所以这个 $4\times 16$ 展平矩阵恰好有 4 个线性无关的行——<strong>秩等于 $4 = 2^2$</strong>（对任意 $n$ 则等于 $n^2$）。
+          现在用价格 $H(T) = \log_2 F_{A|BC}(T)$ 给矩阵乘法不等式 $T_n \le \Delta(r)$ “称重”：
+        </p>
+        <ul>
+          <li>左边 $T_n$：展平秩为 $n^2$，所以 $H(T_n) = \log_2(n^2) = 2\log_2 n$；</li>
+          <li>右边 $\Delta(r) = \sum_{\ell=1}^r e_\ell \otimes (e_\ell \otimes e_\ell)$：它的 $r$ 行互不重叠，展平秩为 $r$，所以 $H(\Delta(r)) = \log_2 r$。</li>
+        </ul>
+        <p>
+          由单调性立刻白捡一条硬不等式：$2\log_2 n \le \log_2 r \implies r \ge n^2$（即 $\omega \ge 2$）。
         </p>
         <p>
-          检验一下它是否满足三条公理：两个展平矩阵直和变成块对角阵，秩相加；张量积变成 Kronecker 积，秩相乘；各站点做线性映射等价于左乘右乘矩阵，秩不增。所以“按 $A$ vs $(B,C)$ 切一刀算矩阵秩”确实是一个合法谱点 $F_{A|BC}$！在这个谱点下：跨切口的导线 $AB$（2 维）和 $AC$（2 维）的矩阵秩都是 $2$（单价 $\log_2 2 = 1$），不跨切口的 $BC$ 矩阵秩是 $1$（单价 $\log_2 1 = 0$），而三方公共标签 $\Delta(r)$ 跨切口秩是 $r$（总价 $\log_2 r$）。于是它能证明 $2 \log_2 n \le \log_2 r \implies r \ge n^2$——<strong>但也就到此为止了，只能证明平庸的 $\omega \ge 2$</strong>。人们在几十年里始终不知道一般域上还有什么能绕开这种粗暴切法的谱点！
+          <strong>瓶颈就在这里</strong>：像 $F_{A|BC}$ 这样一刀切开两个阵营的展平秩，总共只有 3 种切法（$A|BC$、$B|AC$、$C|AB$），算出来的极限全部卡死在平庸的 $\omega \ge 2$。半个世纪里，人们迫切需要找到<strong>不靠简单“一刀两断”的新谱点</strong>。
         </p>
+
+        <details class="self-check">
+          <summary>暂停自测：用“三导线分解”验算为什么 $H_{A|BC}(T_n)$ 恰好等于 $2\log_2 n$</summary>
+          <div class="dive-body">
+            <p><strong>问题</strong>：记住 $T_n \cong I_n^{(AC)} \otimes I_n^{(AB)} \otimes I_n^{(BC)}$，且对数价格把 $\otimes$ 变成相加。在 $A|BC$ 这一刀下，三条导线 $AC, AB, BC$ 各自的价钱是多少？</p>
+            <p><strong>核对</strong>：导线 $AC$ 和 $AB$ 都跨越了切口（一端在 $A$，一端在 $BC$），它们的 $n\times n$ 单位阵展平秩是 $n$，价格各为 $\log_2 n$；而导线 $BC$ 两端都在同一侧（$BC$ 阵营内），当作整体向量看待时展平秩是 $1$，价格为 $\log_2 1 = 0$！三者相加：$\log_2 n + \log_2 n + 0 = 2\log_2 n$。</p>
+          </div>
+        </details>
       </section>
 
       <!-- SECTION 3: EUCLIDEAN TENSOR GEOMETRY -->
       <section id="sec-euclidean">
-        <h2><span class="step-tag">Step 3 · Paper #1 核心引擎</span>03. 欧氏张量几何：把张量放进空间，价格竟然是「距离」与「平均宽度」</h2>
+        <h2><span class="step-tag">Step 03 · Paper #1 核心引擎</span>03. 欧氏张量几何：把张量放到平面上，价格竟然是「距离」与「半周长」</h2>
+
+        <div class="lesson-meta">
+          <div class="lesson-meta-item">
+            <strong>前置依赖</strong>
+            <span>Step 02 的三导线价格相加、$A|BC$ 切法原理；高数里平面直线与投影长度概念。</span>
+          </div>
+          <div class="lesson-meta-item">
+            <strong>本节目标</strong>
+            <span>直观理解为什么导线价格等于距离、共享标签等于半周长，以及 Paper #1 解决的真正代数难题。</span>
+          </div>
+          <div class="lesson-meta-item warn">
+            <strong>核心难点</strong>
+            <span>看懂“随机切一刀求平均”为什么会在直和下失效（正方形反例），从而理解 Paper #1 的含金量。</span>
+          </div>
+        </div>
 
         <p>
-          这就是 11 月 24 日 Family 379 第一篇奠基之作 <em>Euclidean geometry in the asymptotic spectrum of tensors</em> 干的大事：它证明了在<strong>任意域（无论实数域、复数域还是有限域）</strong>上，都可以构造出极其丰富的谱点，而且这些谱点遵守的正是我们最熟悉的<strong>欧几里得几何</strong>！
+          既然“固定切一刀”只能卡出 $\omega \ge 2$，一个极自然的想法是：<strong>把张量的站点画在二维平面（或更高维欧氏空间）里，然后像切西瓜一样，用各个方向随机画来的直线把平面切成两半，去平均每一刀的 $\log_2(\text{展平秩})$</strong>！
         </p>
 
-        <div class="note-block anchor">
-          <span class="note-label">本科知识锚点</span>
-          <p>回忆工科数学里的<strong>内积空间 / Hilbert 空间</strong>与<strong>高斯积分</strong>：在 $\mathbb{R}^d$ 或实 Hilbert 空间里，两点 $u, v$ 有欧氏距离 $\|u - v\|$；给定有限个点 $S$，它们张成的最小凸多边形/凸多面体叫<strong>凸包</strong> $\operatorname{conv}(S)$。往某个单位方向 $g$ 做投影，投影区间的长度就是这个几何体在这个方向上的“宽度”。</p>
+        <h3>3.1 随机切直线（Crofton 几何概率）：距离和半周长是怎么冒出来的？</h3>
+        <ul>
+          <li><strong>只有两个站点 $u, v$ 的 1 比特导线 $E_{uv}(2) = e_0\otimes e_0 + e_1\otimes e_1$</strong>：
+            如果随机直线从 $u$ 和 $v$ 中间穿过，这一刀切口的展平秩是 $2$（贡献 $\log_2 2 = 1$）；如果 $u, v$ 被留在直线同一侧，展平秩是 $1$（贡献 $\log_2 1 = 0$）。在积分几何（Crofton 公式）里，随机直线切中线段 $uv$ 的频率，<strong>正比于两点间的欧氏距离 $\|u - v\|$</strong>！</li>
+          <li><strong>多个站点 $S$ 共享 1 比特的 $\Delta_S(2)$</strong>：
+            只要随机直线穿过点集 $S$ 围成的<strong>凸包（Convex Hull）</strong>（也就是没有把所有点都留在同一侧），切口两边就都分到了点，展平秩是 $2$（贡献 $1$）；否则贡献 $0$。一个方向上能切开点集 $S$ 的平行直线平移宽度，就是 $S$ 在垂线方向上的投影长度——对所有方向平均积分，在二维平面上它精确等于<strong>凸包周长的一半 $P_{\text{hull}}/2$</strong>（高维下称为归一化平均宽度 $W(S)$）！</li>
+        </ul>
+
+        <div class="note-block caution">
+          <span class="note-label">那为什么前人没直接拿“平均切法”去当谱点？——原论文亲手给出的正方形反例</span>
+          <p>
+            你把所有合法谱点取几何平均后，<strong>直和可加性（Axiom 2）会立刻炸掉！</strong> 看原论文第 1 节举的极简反例：把正方形的四个角用“横中线”和“竖中线”切两刀。令 $U$ 是一条水平导线，$V$ 是一条竖直导线。
+          </p>
+          <ul>
+            <li>单独算：$U$ 在（横切，竖切）下的秩是 $(1, 2)$，几何平均为 $\sqrt{1\cdot 2} = \sqrt{2}$；$V$ 的秩是 $(2, 1)$，几何平均也是 $\sqrt{2}$。</li>
+            <li>直和 $U \oplus V$：在横切和竖切下，秩都变成了 $1+2 = 3$，几何平均是 $\sqrt{3\cdot 3} = 3$，而不是直和可加性要求的 $\sqrt{2} + \sqrt{2} = 2\sqrt{2} \approx 2.828$！</li>
+          </ul>
+          <p>
+            因此，11 月 24 日 Family 379 第 1 篇奠基论文 <em>Euclidean geometry in the asymptotic spectrum of tensors</em> 真正惊天动地的成就，不是发现 Crofton 公式，而是<strong>用外代数与非线性谱分析，在任意域上真正构造出了一整套对“任意张量”都严格满足直和可加、张量积可乘、局部线性映射不增的合法谱点</strong>！
+          </p>
         </div>
 
         <div class="note-block theorem">
           <span class="note-label">Theorem 1.1 · 欧氏价格定理（Euclidean Prices）</span>
           <p>
-            对于任意域 $k$ 和任意实 Hilbert 空间 $K$，都可以给“把张量各个指标放在 $K$ 中位置 $x = (x_1, \dots, x_r)$”的系统，赋予一套完全相容的谱价格 $H(T; x)$，满足两条令人拍案叫绝的几何定律：
+            对于任意域 $k$ 和任意实 Hilbert 空间 $K$，存在一套相容的谱价格系统 $H(T; x)$（把张量各个指标放在位置 $x_1, \dots, x_r \in K$），严格满足：
           </p>
           <ol>
-            <li><strong>两点导线定律（2-site wire）</strong>：在位置 $u$ 和 $v$ 之间共享 1 比特的导线（$e_0\otimes e_0 + e_1\otimes e_1$），其价格<strong>精确等于两点间的欧氏距离</strong>：
-              $$H(E_{uv}(2)) = \|u - v\|$$
-            </li>
-            <li><strong>多点共享定律（$k$-site shared bit）</strong>：对于任意有限个点 $S \subset K$，把同一个 $q$ 进制标签同时广播给 $S$ 中所有站点（$\Delta_S(q) = \sum_{j=1}^q \bigotimes_{s\in S} e_j$），其价格是<strong>凸包 $\operatorname{conv}(S)$ 的归一化平均宽度</strong>乘以 $\log_2 q$：
-              $$H(\Delta_S(q)) = W(S)\log_2 q, \qquad W(S) = \sqrt{2\pi}\,\mathbb{E}\max_{s\in S}\langle g, s\rangle$$
-              其中 $g$ 是张成子空间里的标准高斯随机向量。特殊地，在二维平面上：
-              <ul>
-                <li>若 $S$ 是 2 个点：平均宽度就是线段长度 $\|u - v\|$；</li>
-                <li>若 $S$ 是 3 个点（三角形）：平均宽度精确等于<strong>三角形周长的一半</strong> $P/2$！</li>
-                <li>若 $S$ 是平面凸多边形的顶点：平均宽度同样等于其<strong>凸包周长的一半</strong> $P_{\text{hull}}/2$！</li>
-              </ul>
-            </li>
+            <li><strong>两点导线定律</strong>：两点 $u, v$ 间的 $q$ 维导线价格精确等于 $\|u - v\| \log_2 q$（1 比特时即距离 $\|u - v\|$）。</li>
+            <li><strong>多点共享定律</strong>：有限点集 $S$ 共享一个 $q$ 进制标签 $\Delta_S(q)$ 的价格，等于凸包归一化平均宽度 $W(S) \log_2 q$。在二维平面上，$W(S)$ 精确等于 $\operatorname{conv}(S)$ 周长的一半 $P_{\text{hull}}/2$（三角形即半周长）。</li>
+            <li><strong>中继插入免费推论</strong>：如果在点集 $S$ 内部（即凸包 $\operatorname{conv}(S)$ 之内，或某条线段之上）新增一个站点 $z$，凸包不变，因此 $W(S\cup\{z\}) = W(S)$，新增拷贝的额外价格为 $0$。</li>
           </ol>
         </div>
 
-        <p>
-          请花 10 秒钟从高数积分直觉上看看<strong>为什么会有“距离”和“平均宽度”？</strong>（这是原论文第 1 节特意给出的直觉解释）：
-        </p>
-        <ul>
-          <li>把点集 $S$ 放在平面上，任选一条随机直线像切西瓜一样把平面切成两半，计算切口处的“展平矩阵秩”的对数 $\log_2(\text{rank})$：
-            <ul>
-              <li>对于一条连接 $u, v$ 的 1 比特导线：如果随机直线把 $u$ 和 $v$ 切在两边，秩是 $2$（贡献 $\log_2 2 = 1$）；切在同一边，秩是 $1$（贡献 $\log_2 1 = 0$）。在微积分几何概率（Crofton 公式）里，随机直线切中线段 $uv$ 的频率<strong>正比于欧氏距离 $\|u-v\|$</strong>！</li>
-              <li>对于三方共享 1 比特的 $\Delta_S(2)$：只要直线穿过三角形凸包（即没有把三个点全留在同一侧），切口两边就都分到了点，秩就是 $2$（贡献 $1$）。对各个投影方向做积分平均，这个宽度区间长度的期望恰好就是<strong>凸包归一化平均宽度 $W(S)$（在平面上即半周长 $P/2$）</strong>！</li>
-            </ul>
-          </li>
-          <li><strong>真正的难点与突破在哪里？</strong> 既然随机切一刀求几何平均就能得到“距离”和“半周长”，为什么以前没人这么做？因为<strong>“谱点的几何平均”会破坏直和可加性！</strong>
-            <div class="note-block caution" style="margin-top:0.65rem;">
-              <span class="note-label">原论文亲手给出的反例：为什么简单的“平均切法”行不通？</span>
-              <p>把正方形四个角用横竖两条中线切开。令 $U$ 是一条水平导线，$V$ 是一条竖直导线。它们在横竖两刀下的秩分别是 $(2, 1)$ 和 $(1, 2)$，几何平均都是 $\sqrt{2\cdot 1} = \sqrt{2}$。但把它们直和 $U \oplus V$ 之后，横竖两刀下的秩都变成了 $2+1=3$，几何平均是 $\sqrt{3\cdot 3} = 3$，而不是直和可加性要求的 $\sqrt{2}+\sqrt{2} = 2\sqrt{2} \approx 2.828$！因此，第一篇论文真正的硬核突破，是<strong>在任意域上把这组几何距离真正延拓成了对“所有张量”都严格满足直和可加、张量积可乘、局部线性映射不增的合法谱点</strong>！</p>
-            </div>
-          </li>
-        </ul>
+        <details class="deep-dive">
+          <summary>进阶选读：高维 $W(S)$ 的高斯期望公式与 Hilbert 空间延拓</summary>
+          <div class="dive-body">
+            <p>
+              在 $d$ 维子空间中，原论文给出的平均宽度精确公式为 $W(S) = \sqrt{2\pi}\,\mathbb{E}\max_{s\in S}\langle g, s\rangle$，其中 $g$ 是标准高斯向量（各分量独立服从 $\mathcal{N}(0,1)$）。证明策略分两步：先利用外代数和四点曲率不等式证明任何谱空间自带非正曲率（CAT(0)），再假设欧氏平坦子空间存在最大维度 $k$，结合“有界度端口图压缩 + 带标签置换近似门”构造对角线矛盾，迫使任意有限维平坦子空间必然存在，最后通过高维集中效应延拓到无穷维实 Hilbert 空间。
+            </p>
+          </div>
+        </details>
 
         <!-- Interactive Widget 2: Euclidean Tensor Geometry Lab -->
         <div class="lab-panel" id="geometry-lab">
@@ -391,14 +490,21 @@
           </div>
         </div>
 
+        <details class="self-check">
+          <summary>暂停自测：切换到“4点正方形”预设，把 $D$ 拖进 $\triangle ABC$ 内部，会发生什么？</summary>
+          <div class="dive-body">
+            <p><strong>现象与解释</strong>：你会看到右侧“凸包顶点数”立刻从 <code>4 / 4</code> 变成 <code>3 / 4</code>，且无论你在三角形里面怎么拖动 $D$，4 方共享 1 比特的价格 $W(S)$ <strong>一分钱都不涨</strong>！这就是“中继插入免费推论”的几何直观——在后续所有下界论文里，“把计算节点向几何中心/凸包内部挪动从而白嫖运输费用”，是贯穿全局的核心操作。</p>
+          </div>
+        </details>
+
         <details class="deep-dive">
-          <summary>为什么单靠“平直欧氏空间”本身还证明不了 9/4？（关键转折）</summary>
+          <summary>关键转折：为什么单靠“平直欧氏空间”还只能证明 $\omega \ge 2$，冲不到 $9/4$？</summary>
           <div class="dive-body">
             <p>
-              在上面这个实验室里你可能注意到了一个现象：无论你把三角形 $A, B, C$ 拖成什么形状，三条独立导线的总价（周长 $P$）与三方共享 1 比特的价格（半周长 $P/2$）之比，<strong>永远卡死在 $P / (P/2) = 2$</strong>！
+              观察实验室里最后一行红色数值：无论你怎么拖动三角形 $A, B, C$，三条独立导线的总价（周长 $P = AB+BC+CA$）与三方共享 1 比特的价格（半周长 $P/2$）之比，<strong>永远卡死在 $P / (P/2) = 2$</strong>！
             </p>
             <p>
-              这意味着：纯平直的欧氏几何（Euclidean flats）虽然极其强大——足够用来分离 Valiant 层级（$\mathsf{VP} \ne \mathsf{VNP}$）、证明 FFT 的 $\sqrt{\log N}$ 下界、以及证明向日葵猜想——但对于正方形矩阵乘法，平直欧氏几何给的极限下界仍然是 $\omega \ge 2$！要想把下界从 $2$ 一举推到 $9/4 = 2.25$，就必须跨出平直空间，进入下一节的<strong>非正曲率空间（CAT(0) / 三叉戟 Tripod）与球面张量压缩</strong>。
+              也就是说：平直欧氏几何虽然足够解决 Valiant 层级分离、FFT 下界和向日葵猜想，但对正方形矩阵乘法依然只能卡出 $\omega \ge 2$。要想把比值从 $2$ 拉高到 $9/4 = 2.25$，必须走出平直欧氏平面，进入 Step 04 的<strong>非正曲率三叉戟（Tripod）</strong>！
             </p>
           </div>
         </details>
@@ -406,83 +512,87 @@
 
       <!-- SECTION 4: WHY 9/4 -->
       <section id="sec-nine-fourths">
-        <h2><span class="step-tag">Step 4 · Paper #6 + Oct 2 上界</span>04. 为什么矩阵乘法复杂度精确锁定在 $9/4$？</h2>
+        <h2><span class="step-tag">Step 04 · Paper #6 + 10 月 2 日上界</span>04. 为什么矩阵乘法复杂度精确锁定在 $9/4$？</h2>
 
-        <p>
-          要彻底搞懂 $9/4$ 这个数字，我们必须同时看懂<strong>上界（算法怎么做到 $n^{9/4+\varepsilon}$）</strong>和<strong>下界（为什么绝对不可能比 $n^{9/4}$ 更快）</strong>。
-        </p>
+        <div class="lesson-meta">
+          <div class="lesson-meta-item">
+            <strong>前置依赖</strong>
+            <span>Step 03 的欧氏三角形比值=2；基本反证法思路。</span>
+          </div>
+          <div class="lesson-meta-item">
+            <strong>本节目标</strong>
+            <span>看懂上界 $9/4$（多项式乘法桥）与下界 $9/4$（三叉戟 + 压缩反证）如何双面合拢，以及长方形公式。</span>
+          </div>
+          <div class="lesson-meta-item warn">
+            <strong>核心难点</strong>
+            <span>下界不是“直接算一条 $9/4$ 不等式”，而是用反证法：“若 $\omega < 9/4$，就能过度压缩网络并撞碎另一道已知下界”。</span>
+          </div>
+        </div>
 
-        <h3>前半程：上界 $\omega \le 9/4$ 是怎么来的？（10 月 2 日论文 + ABVZ）</h3>
+        <h3>4.1 上界 $\omega \le 9/4$：换一块跳板——普通多项式乘法（10 月 2 日论文 + ABVZ）</h3>
         <p>
-          从 1986 年到 2026 年初，整整四十年里，大家一直沿着 Coppersmith–Winograd（CW）张量的“激光法（Laser Method）”一点点抠小数点，从 $2.3755$ 抠到 $2.371177$。2026 年 10 月 2 日 OpenAI 发布的上界论文（随后 Amanov–van den Berg–Zuiddam 等人推广至任意域），换了一块完全不同的跳板：<strong>普通多项式乘法（Polynomial Multiplication）</strong>！
+          从 1986 年到 2026 年初，大家一直优化 Coppersmith–Winograd（CW）张量的“激光法”，把上界慢慢抠到 $2.371177$。2026 年 10 月 2 日 OpenAI 发布的上界论文（随后 Amanov–van den Berg–Zuiddam 等人推广至任意域），彻底换了一块跳板：<strong>两个多项式相乘</strong>。
         </p>
         <p>
-          把两个多项式 $(p_0 + p_1 x + \dots + p_{a-1}x^{a-1})(q_0 + q_1 x + \dots + q_{b-1}x^{b-1})$ 相乘（例如 $a=b=2$ 时，$(p_0+p_1 x)(q_0+q_1 x) = p_0 q_0 + (p_0 q_1 + p_1 q_0)x + p_1 q_1 x^2$，输入长度都是 $2$，输出长度是 $3$），写成三线性型也是一个张量。虽然一次多项式乘法用 FFT 看起来很容易，但论文反过来研究“在 Strassen 谱点眼中，多项式乘法张量的‘几何平均轮廓’ $P(a, b)$ 随 $a, b$ 增大的增长速度”：
+          例如把两个一次多项式 $(p_0 + p_1 x)(q_0 + q_1 x) = p_0 q_0 + (p_0 q_1 + p_1 q_0)x + p_1 q_1 x^2$ 相乘，输入系数长度是 $a=2, b=2$，输出长度是 $a+b-1=3$。用 Step 01 的方法，多项式乘法也是一个三阶张量。论文反过来问：在 Strassen 谱点眼中，多项式乘法张量的“对称几何平均价值” $P(a, b)$ 随长度增长有多快？
         </p>
         <ul>
-          <li>通过一个精妙的<strong>局部退化（Separation Degeneration）</strong>和三段分解，证明了 $P(a, 3h+a-1) \ge 3 P(a, h)$，再加上递增凹性，硬生生逼出了对称情况下的下界 $P(a, a) \ge a^{4/3}$；</li>
-          <li>另一方面，用多项式插值去逼近，任何谱点在 $n\times n$ 矩阵乘法张量 $T_n$ 上取值如果是 $n^{3t}$，则迫使 $P(a, b) \le (a+b-1)^{1/t}$；</li>
-          <li>把两个不等式往一起一撞：$a^{4/3} \le P(a, a) \le (2a-1)^{1/t}$，当 $a\to\infty$ 时就逼出 $1/t \ge 4/3 \implies t \le 3/4$，因此矩阵乘法指数 $\omega \le 3t = 3 \times \frac{3}{4} = \frac{9}{4}$！</li>
+          <li>通过一个局部退化构造，证明下界增长足够快：<strong>$P(a, a) \ge a^{4/3}$</strong>；</li>
+          <li>另一方面，任何在矩阵乘法 $T_n$ 上取值为 $n^{3t}$ 的谱点，由多项式插值迫使 <strong>$P(a, b) \le (a+b-1)^{1/t}$</strong>；</li>
+          <li>两头一夹：$a^{4/3} \le (2a-1)^{1/t}$，令 $a \to \infty$ 逼出 $1/t \ge 4/3 \implies t \le 3/4$，所以矩阵乘法指数满足 $\omega \le 3t = 3 \times \frac{3}{4} = \frac{9}{4}$！</li>
         </ul>
 
-        <h3>后半程：下界 $\omega \ge 9/4$ 是怎么锁死的？（11 月 24 日 111 页主论文）</h3>
-        <p>
-          既然上界通过多项式乘法卡在了 $9/4$，那有没有可能存在某种完全不用多项式乘法的神奇算法，能把矩阵乘法推向 $\omega = 2$？11 月 24 日的新论文《<em>The matrix multiplication exponent is nine fourths</em>》给出的回答是：<strong>不可能！哪怕只要求算术电路对任意 $n\ge 2$ 在任意域上做形式计算，非标量乘除门数量也至少是 $\lceil n^{9/4}/2 \rceil$。</strong>
-        </p>
-        <p>
-          它的证明结构非常漂亮，采用了理论计算机科学里最硬核的<strong>反证法（Algorithmic Compression $\to$ Lower Bound Contradiction）</strong>，分三步走：
-        </p>
-
-        <div class="compare-pair">
-          <div class="compare-box">
-            <h4>第一步：为什么 $9/4$ 对应“三叉戟（Tripod）”？</h4>
+        <details class="deep-dive">
+          <summary>进阶选读：多项式上界里的“分离退化（Separation Degeneration）”是什么？</summary>
+          <div class="dive-body">
             <p>
-              在上一节我们看到，平面三角形里三条导线总价 $6$，共享 1 比特代价是 $3$，比值是 $6/3=2$。但如果把三个站点 $A, B, C$ 放到非正曲率空间（CAT(0)）的一个<strong>三叉戟（三条长度为 $1$ 的射线在中心 $O$ 汇合）</strong>的三个端点上：
-            </p>
-            <ul>
-              <li>任意两个端点经过中心 $O$ 相连，距离都是 $1+1=2$，所以 $T_n$ 的三条边总价是 $(2+2+2)\log_2 n = 6\log_2 n$；</li>
-              <li>如果三方共享 1 比特在三叉戟端点处的费率 $D$ 等于 $8/3$，那么比值立刻变成 $\frac{6}{8/3} = \frac{9}{4}$！</li>
-            </ul>
-          </div>
-          <div class="compare-box">
-            <h4>第二步：如果 $\omega &lt; 9/4$ 会发生什么“异象”？</h4>
-            <p>
-              论文先用局部环化简把“任意域上有 $\omega_F &lt; 9/4$”转化成“<strong>某个有限域 $k$ 上存在 $\omega_k &lt; 9/4$</strong>”（Lemma <code>lem:specialize</code>）。
-            </p>
-            <p>
-              一旦 $\omega_k &lt; 9/4$，这种带有三叉戟费率 $8/3$ 的价格“移动”就被彻底封死了（Tripod 排除）。这会迫使作者构造的<strong>球面张量（Sphere Tensors）</strong>的价格在所有参数位置上“同步锁死”，从而让张量网络可以通过“批量稳定排序”和“比特汇聚”被<strong>无损/微损压缩</strong>（Theorem <code>thm:shaving</code>）：把原本规模为 $m$ 的三价张量网络（有 $e$ 个外部比特）复制 $d$ 份后，每份的体积能省掉一个对数幂因子 $h^{-\gamma}$，只付出极小的每比特代价 $h^\eta$！
+              构建渐近算法最大的困难是“有用的张量块虽然在两条腿上互相独立，却往往在第三条腿上纠缠在一起，构不成直和”。10 月 2 日论文用有限傅里叶投影给出块标签，再配合以标签错配平方为权重的退化，把共享第三条腿的块硬生生拆成了真正独立的直和块，从而导出 $P(a, 3h+a-1) \ge 3 P(a, h)$ 并与边界条件 $P(1, b) = b$ 共同推出 $P(a, a) \ge a^{4/3}$。
             </p>
           </div>
-        </div>
+        </details>
 
-        <div class="note-block theorem">
-          <span class="note-label">第三步：把压缩机接在“多列表互异检验”上，直接炸穿下界！</span>
-          <p>
-            拿来一个非常简单的基准问题 $D_w$：给你一个包含 $2^w$ 个单词（每个词长 $2w$ 比特）的列表，判断里面<strong>有没有重复单词</strong>（全互异输出 1，否则输出 0）。用 Batcher 排序网络，单个列表只需要 $O(n_w w^2)$ 规模的电路（每个输入比特花费 $O(w^2)$ 体积）。
-          </p>
-          <p>
-            现在考察同时检验 $t$ 个<strong>互相独立</strong>的列表 $D_w^{\otimes t}$。论文证明了一条独立于矩阵乘法的硬性下界（Theorem <code>thm:many</code>）：哪怕允许电路在 $t$ 个列表之间任意共享内部连线，每个输入比特的体积也<strong>绝对不可能低于 $w^\sigma$</strong>（其中 $\sigma > 0$ 是常数）。
-          </p>
-          <p>
-            <strong>矛盾诞生了！</strong> 如果真的存在 $\omega_k &lt; 9/4$ 的矩阵乘法，把我们的“张量压缩机”沿着 $D_w$ 连续运行固定 $J$ 轮（令 $\eta &lt; \sigma$），每输入比特的体积就会从 $O(w^2)$ 一路被压扁到 $O(w^\eta) \ll w^\sigma$——<strong>直接撞碎了独立列表互异检验的体积下界！</strong> 由此反推出在任何有限域上 $\omega_k \ge 9/4$，进而得出在一切域上 $\omega_F = 9/4$。
-          </p>
-        </div>
-
-        <h3>长方形矩阵乘法的完整精确公式（已进入 Lean 4 范围）</h3>
+        <h3>4.2 下界 $\omega \ge 9/4$：11 月 24 日 111 页主论文的四步反证逻辑</h3>
         <p>
-          更令人惊叹的是，不仅正方形（$n\times n$ 乘 $n\times n$）的指数被钉死在 $9/4$，这篇论文和 Lean 文件 <code>ExactExponent.lean</code> 还给出了<strong>任意长方形矩阵乘法</strong> $(N^a \times N^b) \cdot (N^b \times N^c)$ 的精确复杂性公式：把非负权重 $a, b, c$ 从大到小排成 $x \ge y \ge z > 0$，则其算术指数 $\omega(F; a, b, c)$ 在任意域 $F$ 上精确等于：
+          11 月 24 日的论文《<em>The matrix multiplication exponent is nine fourths</em>》证明：对任意域 $F$、任意规模 $n \ge 2$，形式算术电路至少需要 $\lceil n^{9/4}/2 \rceil$ 个乘除门，因此 $\omega_F = 9/4$。它的证明不是一刀直接算出 $9/4$，而是环环相扣的四步反证链：
+        </p>
+
+        <ol class="step-flow">
+          <li>
+            <strong>为什么 $9/4$ 对应“三叉戟（Tripod）”而不是平面三角形？</strong>
+            <p>设想三条长为 $1$ 的臂在中心点 $O$ 汇合成一个 Y 形三叉戟，把矩阵乘法的三个站点 $A, B, C$ 放在三个臂端。因为任意两点必须经过中心 $O$ 相连，边长为 $1+1=2$，所以三条导线总价为 $(2+2+2)\log_2 n = 6\log_2 n$。如果三方共享 1 比特在此处的价格率为 $8/3$，那么比值正好就是 $\frac{6}{8/3} = \frac{9}{4}$！</p>
+          </li>
+          <li>
+            <strong>把任意域反证问题归约到有限域（<code>lem:specialize</code>）</strong>
+            <p>假设存在某个域 $F$ 使得 $\omega_F < 9/4$。利用有限生成环与 Zariski 引理，可以把这组省乘法的双线性恒等式模到一个极大理想上，从而必然存在某个<strong>有限域 $k$</strong> 上也有 $\omega_k < 9/4$。</p>
+          </li>
+          <li>
+            <strong>用 $\omega_k < 9/4$ 排除三叉戟，造出“张量网络压缩机”（<code>thm:shaving</code>）</strong>
+            <p>一旦 $\omega_k < 9/4$，上面费率为 $8/3$ 的三叉戟“移动”就被禁止了。这迫使作者设计的一类“球面张量（Sphere Tensors）”的价格在各个参数位置上同步锁死；借由“批量稳定排序 + 比特汇聚”，任意不太大的三价张量网络在复制 $d$ 份后，每份体积竟然可以省掉一个对数幂因子 $h^{-\gamma}$，仅需付出极小的额外端口费 $h^\eta$！</p>
+          </li>
+          <li>
+            <strong>撞碎“多列表互异检验”的硬下界（<code>thm:many</code>）</strong>
+            <p>考虑一个极简单的基准问题 $D_w$：检验 $2^w$ 个 $2w$ 比特单词是否两两互异（Batcher 排序网络只需每比特 $O(w^2)$ 体积）。论文先独立证明：同时检验 $t$ 个独立列表 $D_w^{\otimes t}$，哪怕允许跨列表共享连线，每比特体积也绝对至少是 $w^\sigma$（$\sigma > 0$）。把上一步的“压缩机”连跑固定 $J$ 轮，体积会被压扁到 $O(w^\eta) \ll w^\sigma$——矛盾！故 $\omega_k \ge 9/4$。</p>
+          </li>
+        </ol>
+
+        <h3>4.3 长方形矩阵乘法的完整精确公式（已写入 Lean 4）</h3>
+        <p>
+          不仅正方形的指数锁定在 $9/4$，论文与 Lean 文件 <code>ExactExponent.lean</code> 还给出了<strong>任意长方形矩阵乘法</strong> $(N^a \times N^b) \cdot (N^b \times N^c)$ 的精确复杂性公式：把非负权重 $a, b, c$ 降序排列为 $x \ge y \ge z > 0$，则任意域 $F$ 上精确等于：
         </p>
         <div class="math-display">
           $$\omega(F; a, b, c) \;=\; x + y + \frac{\bigl[\max\bigl(0,\, (x+y)z - xy\bigr)\bigr]^2}{4xyz}$$
         </div>
-        <p>
-          把 $a=1, b=1, c=t \in [0, 1]$ 代入看看！此时 $x=1, y=1, z=t$，分子里的 $(x+y)z - xy = 2t - 1$：
-        </p>
-        <ul>
-          <li>当 $t \le \frac{1}{2}$ 时，$2t - 1 \le 0$，修正项为 $0$，复杂度是纯粹的 $2$！也就是说，乘一个 $n \times \sqrt{n}$ 与 $\sqrt{n} \times n$ 的长方形矩阵，渐近复杂度只需要 $n^{2+o(1)}$（恰好等于输出矩阵的尺寸），即<strong>对偶指数（Dual Exponent）精确等于 $\alpha = 1/2$</strong>；</li>
-          <li>当 $t > \frac{1}{2}$ 时，复杂度平滑地二次抬升：$\omega(F; 1, 1, t) = 2 + \frac{(2t-1)^2}{4t}$；</li>
-          <li>当 $t = 1$（正方形）时，立刻得到 $2 + \frac{(2-1)^2}{4} = \frac{9}{4} = 2.25$！</li>
-        </ul>
+
+        <details class="self-check">
+          <summary>暂停自测：代入 $a=1, b=1, c=t$，手算“对偶指数 $\alpha = 1/2$”与“正方形 $9/4$”</summary>
+          <div class="dive-body">
+            <p>当 $a=1, b=1, c=t \in (0, 1]$ 时，降序后 $x=1, y=1, z=t$。分子中的核心判别项为 $(x+y)z - xy = 2t - 1$：</p>
+            <ul>
+              <li>若 $t \le 1/2$，则 $2t - 1 \le 0$，$\max(0, 2t-1) = 0$，因此 $\omega(F; 1, 1, t) = 1 + 1 + 0 = 2$！这意味着 $n \times \sqrt{n}$ 乘 $\sqrt{n} \times n$ 的时间渐近只等于输出大小 $n^2$（<strong>对偶指数 $\alpha = 1/2$</strong>）。</li>
+              <li>若 $t = 1$（正方形），则 $\omega(F; 1, 1, 1) = 2 + \frac{(2\cdot 1 - 1)^2}{4\cdot 1\cdot 1\cdot 1} = 2 + \frac{1}{4} = \frac{9}{4}$！</li>
+            </ul>
+          </div>
+        </details>
 
         <!-- Interactive Widget 3: Matrix Multiplication History & Rectangular Formula Lab -->
         <div class="lab-panel" id="mm-lab">
@@ -515,9 +625,7 @@
 
           <div class="geo-split">
             <div>
-              <svg id="rectCurveSvg" class="svg-stage" viewBox="0 0 420 230" aria-label="对偶指数与矩阵乘法曲线">
-                <!-- Rendered by JS -->
-              </svg>
+              <svg id="rectCurveSvg" class="svg-stage" viewBox="0 0 420 230" aria-label="对偶指数与矩阵乘法曲线"></svg>
               <p class="geo-caption">
                 左图展示 $\omega(F; 1, 1, t)$ 随内维度指数 $t \in [0, 1]$ 的变化曲线：在 $t \in [0, 0.5]$ 处于“零溢价平台期”（$\omega = 2$），越过 $\alpha = 1/2$ 后按 $\frac{(2t-1)^2}{4t}$ 爬升至 $9/4$。
               </p>
@@ -532,96 +640,126 @@
 
       <!-- SECTION 5: OTHER 5 PAPERS IN FAMILY 379 -->
       <section id="sec-five-siblings">
-        <h2><span class="step-tag">Step 5 · 一把钥匙开六把锁</span>05. 同一套“欧氏张量几何”，如何同时横扫其余五大难题？</h2>
+        <h2><span class="step-tag">Step 05 · 一把钥匙开六把锁</span>05. 同一套“欧氏张量几何”，如何同时横扫其余五大难题？</h2>
 
-        <p>
-          为什么“九篇里有七篇都与张量相关”？因为一旦你手里有了第一篇论文造出来的“欧氏空间价格尺子”，你就可以把不同的计算任务<strong>摆放到不同的几何图形上</strong>，让几何约束直接逼出复杂度的极限。下面我们按工科直觉逐一拆解其余五篇（均属于 Family 379）：
-        </p>
+        <div class="lesson-meta">
+          <div class="lesson-meta-item">
+            <strong>前置依赖</strong>
+            <span>Step 03 的欧氏价格法则；本科《算法/数据结构》《信号与系统》基础常识。</span>
+          </div>
+          <div class="lesson-meta-item">
+            <strong>本节目标</strong>
+            <span>用“几何摆放位置决定算力价格”的统一视角，速览 Family 379 其余五篇的结论与最小例子。</span>
+          </div>
+          <div class="lesson-meta-item warn">
+            <strong>阅读提示</strong>
+            <span>正文保留核心结论与最小例子；证明构造细节全部收进折叠框，按兴趣展开。</span>
+          </div>
+        </div>
 
         <h3>1. 路径、二叉树与网格分离 Valiant 层级（$\mathsf{VF} \subsetneq \mathsf{VBP} \subsetneq \mathsf{VP} \subsetneq \mathsf{VNP}$）</h3>
-        <div class="note-block anchor">
-          <span class="note-label">本科知识锚点</span>
-          <p>在算法课里我们学过：有些多项式很容易写成括号嵌套的公式（Formula），有些适合用分层状态转移图来算（代数分支程序 ABP，比如矩阵连乘），更一般的是允许复用中间结果的电路（Circuit，对应 $\mathsf{VP}$），而 $\mathsf{VNP}$ 则允许对指数多个“布尔见证变量”求和（对应难算的 NP 类代数版本）。</p>
-        </div>
         <p>
-          这篇论文直接用同一个极其简洁的模板——<strong>图上的状态和（State Sum）</strong> $Z_{G,q}(X) = \sum_{a \in [q]^E} \prod_{v\in V} X_{v, a|_{E(v)}}$——一次性把四层代数复杂度类全部严格分开！先看一个最小例子感受一下它是什么：如果图 $G$ 是一条只有 3 个顶点、2 条边的路径（$v_1 \stackrel{i}{\text{—}} v_2 \stackrel{j}{\text{—}} v_3$），每条边取 $q$ 个状态，那它的状态和就是
-          $$Z_{\text{path}_3, q}(X) = \sum_{i=1}^q \sum_{j=1}^q x_i\, Y_{ij}\, z_j = x^\top Y z$$
-          ——就是本科线性代数的“行向量 $\times$ 矩阵 $\times$ 列向量”！如果把路径拉长到 $n$ 个顶点，就变成 $n$ 个矩阵连乘；放到二叉树上，就变成从树叶到树根的自底向上树状收缩；放到 $n\times n$ 网格上，就变成二维张量网络缩并（即 $\mathsf{VNP}$ 类）。做法优雅得像魔术：
+          在代数复杂度里，算式越自由越省规模：括号嵌套的公式（$\mathsf{VF}$）$\subseteq$ 分层状态转移图（代数分支程序 $\mathsf{VBP}$）$\subseteq$ 允许复用中间结果的电路（$\mathsf{VP}$）$\subseteq$ 允许指数求和的验证类（$\mathsf{VNP}$）。
         </p>
-        <ul>
-          <li><strong>把图每条边的两个端点，放在欧氏空间一条专属坐标轴的正负单位向量上</strong>。此时图张量的总价格正好等于所有边长之和。</li>
-          <li>任何“小电路/小分支程序/小公式”都会在某种分割方式下存在“低秩割（Low-rank cut）”——把这些低秩割处的中继站点往两边挪一点，如果跨割边的数量很多，就能在欧氏价格上占大便宜！</li>
-          <li>于是，只要图在不同割下跨过足够多的边，小模型就绝无可能算出它：<strong>路径（Path）</strong> 分离公式与分支程序（$\mathsf{VF} \subsetneq \mathsf{VBP}$）；<strong>完全二叉树（Binary Tree）</strong> 分离分支程序与电路（$\mathsf{VBP} \subsetneq \mathsf{VP}$）；<strong>$n\times n$ 网格（Square Grid）</strong> 分离 $\mathsf{VP}$ 与 $\mathsf{VNP}$（给出 $n^{\Omega((\log n)^{1/12})}$ 边界电路下界）！</li>
-        </ul>
+        <p>
+          论文用一个统一模板——<strong>图上的状态和（State Sum）</strong> $Z_{G,q}(X) = \sum_{a \in [q]^E} \prod_{v\in V} X_{v, a|_{E(v)}}$——一次性把四层全部严格分开！看最小例子：若图 $G$ 是 3 个顶点、2 条边的路径（$v_1 \stackrel{i}{\text{—}} v_2 \stackrel{j}{\text{—}} v_3$），它的状态和就是 $Z_{\text{path}_3, q}(X) = \sum_{i,j=1}^q x_i Y_{ij} z_j = x^\top Y z$。于是：<strong>路径</strong>把公式与分支程序分开（$\mathsf{VF} \subsetneq \mathsf{VBP}$）；<strong>完全二叉树</strong>把分支程序与电路分开（$\mathsf{VBP} \subsetneq \mathsf{VP}$）；<strong>$n\times n$ 方形网格</strong>把电路与指数求和类分开（$\mathsf{VP} \subsetneq \mathsf{VNP}$）！
+        </p>
+        <details class="deep-dive">
+          <summary>展开看：欧氏几何怎么给网格/树/路径算下界？</summary>
+          <div class="dive-body">
+            <p>把每条边的两个端点放到欧氏空间一条独立坐标轴的正负单位向量上。任何小公式/小 ABP/小电路都会在对应模型切法下存在“低秩割”，从而可以挪动中继站点节省跨越该割的所有边的欧氏运输价；而路径的嵌套二分、完全二叉树的定规模边界、网格的 $\Omega(r)$ 割边数，正好在各自尺度上封死了小模型的节省空间，得到网格度分量边界电路下界 $n^{\Omega((\log n)^{1/12})}$。</p>
+          </div>
+        </details>
 
         <h3>2. 有向哈密顿回路与积和式（Permanent）电路下界</h3>
         <p>
-          对于 $2\times 2$ 矩阵 $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$，行列式是 $ad - bc$，积和式是 $ad + bc$。行列式（Det）因为有加减正负号抵消，所以 $O(n^3)$ 高斯消元就能算出来；把所有负号全抹成 $+1$ 就成了<strong>积和式（Permanent, $\operatorname{Per}_N = \sum_{\pi} \prod_{i=1}^N X_{i,\pi(i)}$）</strong>，它计算所有有向圈覆盖的权重和，是 $\mathsf{VNP}$-完全的代表难题（除非域特征为 2，此时 $-1=+1$ 二者重合）。
+          对 $2\times 2$ 矩阵 $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$，行列式是 $ad - bc$，积和式是 $ad + bc$。行列式有正负号抵消，所以 $O(n^3)$ 高斯消元就能算；抹掉负号的<strong>积和式（$\operatorname{Per}_N$）</strong>和<strong>有向哈密顿回路多项式（$\operatorname{HC}_N$）</strong>则是 $\mathsf{VNP}$-完全的代表难题（除非域特征为 $2$，此时 $-1=+1$）。论文证明：在任意域上 $\operatorname{HC}_N$（及特征 $\ne 2$ 时的 $\operatorname{Per}_N$）的度分量边界电路规模至少为 $\exp\bigl(c(\log N)^2 / (\log\log N)^2\bigr)$。
         </p>
-        <p>
-          这篇论文证明了在任意域上，有向哈密顿回路多项式（及特征 $\ne 2$ 时的 $\operatorname{Per}_N$）的度分量边界电路规模至少达到 $\exp\bigl(c(\log N)^2 / (\log\log N)^2\bigr)$。它的证明把特征按几何性质一分为二：若该域的导线度量空间支持有界度扩展图（Port expansion），就用“压缩模拟自身计数”的逻辑对角线矛盾；若不支持扩展图，就利用反方向的熵不等式挑出一个精妙摆放位置，让外部积张量（Minor tensors）的价格直接压倒小电路！
-        </p>
+        <details class="deep-dive">
+          <summary>展开看：证明如何按域特征的“扩展性”分成两条路？</summary>
+          <div class="dive-body">
+            <p>根据该特征下的导线度量空间是否满足非线性 Poincaré 不等式（能否承载有界度扩展图端口）分成两路：能承载则用网络压缩自举模拟自身计数产生对角线矛盾（直接得出 $2^{N^\varepsilon}$）；不能则利用随机游走熵不等式构造精妙的行点摆放，让外代数子式张量的欧氏价格击败任何小电路。</p>
+          </div>
+        </details>
 
-        <h3>3. 有限傅里叶变换（FFT）与多项式乘法：打破 $N \log N$ 的算术极限？</h3>
-        <div class="note-block anchor">
-          <span class="note-label">本科知识锚点</span>
-          <p>工科《信号与系统》或《数值分析》最经典的结论之一就是 Cooley–Tukey 快速傅里叶变换（FFT）：长度 $N$ 的离散傅里叶变换需要 $O(N\log N)$ 次加减和复数乘法。半个世纪以来，大家几乎默认 $N\log N$ 就是 FFT 门数的不可逾越之墙（虽然理论上只知道 $\Omega(N)$ 或特定受限模型下的 $\Omega(N\log N)$）。</p>
-        </div>
+        <h3>3. 有限傅里叶变换（FFT）与多项式乘法：最优对数指数竟然是 $1/2$</h3>
         <p>
-          OpenAI 的这篇论文宣称了一件颠覆直觉的事：在允许任意标量加权线性门（Linear gates：$au+bv$）的无环线性电路模型里，有限阿贝尔群傅里叶变换（包含复数 DFT 与 Walsh–Hadamard 变换）以及<strong>形式多项式卷积</strong>的真正最优门数，对数指数竟然不是 $1$，而是 <strong>$1/2$</strong>！
+          工科《信号与系统》熟知：长度 $N$ 的离散傅里叶变换（DFT）或 Walsh–Hadamard 变换（$N=2$ 时即输出 $x_0+x_1, x_0-x_1$），经典 Cooley–Tukey FFT 需要 $O(N\log N)$ 次线性加权操作。令人意外的是，论文证明在任意标量加权线性门（$au+bv$）无环电路模型里，有限阿贝尔群傅里叶变换（含复数 DFT）与<strong>形式多项式卷积</strong>的真正门数极限是 $N(\log N)^{1/2+o(1)}$：
         </p>
         <div class="math-display">
           $$c\, J N \sqrt{\log N} \;\le\; C_K(T) \;\le\; C_\varepsilon\, J N (1 + \log N)^{1/2 + \varepsilon}$$
         </div>
-        <ul>
-          <li><strong>下界 $\Omega(N\sqrt{\log N})$ 怎么用几何证？</strong> 把矩阵的行标签放在矩形左边两角、列标签放在右边两角（宽 $1$、高 $L$）。置换矩阵在该矩形下的欧氏价格是 $(L+1)\log N$，而傅里叶特征表（Character Table）的价格是 $(L+\sqrt{1+L^2})\log N$。当 $L \sim 1/\sqrt{\log N}$ 时，两者拉开常数级的价格差 $\approx \frac{1}{2}L^2\log N$，直接卡出 $\sqrt{\log N}$ 的门数下界（甚至允许反馈状态和低秩/稀疏误差，且已完整写入 Lean 4 文档 <code>ExactFourier.lean</code> 中）！</li>
-          <li><strong>上界 $O_\varepsilon(N(\log N)^{1/2+\varepsilon})$ 怎么做到比 FFT 更省门？</strong> 直觉来自批处理与概率集中：把多组输入打包并用符号移位，频率基下的负号奇偶性在中心二项分布的 $O(\sqrt{m\log m})$ 窄区间内恰好是一个低次多项式！先用 $O(\sqrt{m\log m})$ 阶段预测大部分输出，再把极少数例外误差线性压缩送入频域修补。</li>
-        </ul>
+        <details class="deep-dive">
+          <summary>展开看：$\sqrt{\log N}$ 的下界矩形测试与上界二项预测</summary>
+          <div class="dive-body">
+            <ul>
+              <li><strong>下界</strong>：把输入行标签放在宽 $1$ 高 $L$ 的矩形左边两角、输出列标签放在右边两角。置换矩阵价格是 $(L+1)\log N$，而傅里叶特征表价格是 $(L+\sqrt{1+L^2})\log N$；在 $L \sim 1/\sqrt{\log N}$ 处拉开 $\approx \frac{1}{2}L^2\log N$ 价格差，逼出 $\Omega(JN\sqrt{\log N})$ 门数下界（已形式化）。</li>
+              <li><strong>上界</strong>：把多批输入做符号移位，利用二项分布集中在 $O(\sqrt{m\log m})$ 窄区间的特性，用该次数的低次多项式一次性预测出绝大部分符号奇偶性，再对极少数例外做低秩频域修复。</li>
+            </ul>
+          </div>
+        </details>
 
         <h3>4. 多带图灵机大整数乘法：$n (\log n)^{1/2 + o(1)}$</h3>
         <p>
-          2019 年 Harvey 与 van der Hoeven 终于证明了两个 $n$ 比特整数相乘可以在 $O(n \log n)$ 时间内完成（匹配 Schönhage–Strassen 半个世纪前的猜想）。但那是在“随机访问机器（RAM）”或一般多带图灵机且未打破 $\log n$ 屏障的前提下。
-        </p>
-        <p>
-          把上面这篇 FFT 省门的技巧搬到只有一维磁带、磁头每步只能左右移动 1 格的<strong>确定性多带图灵机</strong>上，并通过精心组织多路并发数据流分摊磁头来回扫描的搬运开销（矩形重排），OpenAI 构造出了一台固定图灵机，仅用 $O(n)$ 空间和 <strong>$n(1+\log n)^{1/2+o(1)}$ 最坏时间</strong>就完成了 $n$ 比特精确整数乘法！同时借助变量数版 Weak ETH（弱指数时间假说）与欧氏张量几何对矩阵转置的通讯代价下界，证明了在这个模型下 $\Omega(n\sqrt{\log n})$ 是不可突破的（因此对数指数同样锁定在 $1/2$）。
+          在只能在一维磁带上左右逐格移动的<strong>确定性多带图灵机</strong>上，2019 年 Harvey–van der Hoeven 给出了 $O(n\log n)$ 整数乘法。OpenAI 把上面 FFT 的批量预测和矩形地址重排搬到磁带上分摊磁头移动，造出一台固定图灵机，在 $O(n)$ 空间和 <strong>$n(1+\log n)^{1/2+o(1)}$ 最坏时间</strong>内完成 $n$ 比特精确乘法；并在变量数 Weak ETH 下用欧氏张量几何给出匹配的 $\Omega(n\sqrt{\log n})$ 下界。
         </p>
 
         <h3>5. 固定花瓣数的向日葵猜想（Erdős–Rado Sunflower Conjecture）</h3>
         <p>
-          如果一组集合中任意两个集合的交集都完全相同——例如 $\{a,b,c\}, \{a,d,e\}, \{a,f,g\}$ 任意两两相交都是 $\{a\}$，像向日葵共同的花盘（Core $\{a\}$）和互不相交的花瓣（Petals $\{b,c\}, \{d,e\}, \{f,g\}$）——就叫一个 $3$-向日葵。1960 年 Erdős 和 Rado 猜想：只要集合元素个数不超过 $k$ 且没有 $r$-向日葵，集合总数就最多是 $B_r^k$（底数 $B_r$ 只与花瓣数 $r$ 有关，与 $k$ 无关）。经典做法只能得到 $k!(r-1)^k$，近年 Alweiss 等人突破到了 $(C r \log(rk))^k$，但仍残留 $\log k$ 因子。
+          例如 $\{a,b,c\}, \{a,d,e\}, \{a,f,g\}$ 任意两两交集都是 $\{a\}$，像共享花盘 $\{a\}$ 和互不相交的三片花瓣——这就是一个 $3$-向日葵。1960 年 Erdős 和 Rado 猜想：每个集合最多 $k$ 个元素且不含 $r$-向日葵的集合族，数量最多不超过 $B_r^k$（底数 $B_r$ 只依赖 $r$ 而与 $k$ 无关）。论文最终证明 $\log_2 B_r = O((\log r)^4 (\log\log(2r))^{5/2})$，彻底消除了之前 $(C r\log(rk))^k$ 里的 $\log k$ 尾巴！
         </p>
-        <p>
-          这篇文章把集合家族的 $k$ 个坐标编码成单词，把 $r$ 组词放到欧氏空间的不同站点群。当这 $r$ 组词不存在向日葵时，在每个坐标列上用张量滤波器淘汰掉“部分重复（partial repetition）”——于是 $r$ 组原本独立的标签被迫坍缩成<strong>全组共享的同一个标签</strong>！欧氏凸包平均宽度定理立即给出“独立变共享”必须支付至少 $\rho \log_2 N$ 的价格，只要单列过滤器的净代价不超过一个与字母表大小无关的常数 $f$，直接就得出 $\rho \log_2 N \le k f \implies N \le B_r^k$，其中 $\log_2 B_r = O((\log r)^4 (\log\log(2r))^{5/2})$！
-        </p>
+        <details class="deep-dive">
+          <summary>展开看：集合交集怎么变成欧氏张量？</summary>
+          <div class="dive-body">
+            <p>先用随机染色把集合元素排成长度为 $k$ 的词；再把 $r$ 组独立选出的词摆在欧氏空间不同站点群上。在每个坐标列上施加一个淘汰“部分重复（某个字母出现 $\ge 2$ 次但未占满 $r$ 行）”的张量滤波器。如果集合族里没有 $r$-向日葵，最后唯一能活下来的只有“$r$ 个词完全相同”的对角项——从而把 $r$ 个独立标签强行坍缩成 1 个全局共享标签！欧氏平均宽度差直接锁死 $\rho \log_2 N \le kf \implies N \le B_r^k$。</p>
+          </div>
+        </details>
       </section>
 
       <!-- SECTION 6: FAMILY 380 -->
       <section id="sec-family-380">
-        <h2><span class="step-tag">Step 6 · Family 380</span>06. 另一条战线：线性规划的极限与多胞体的“迷宫”</h2>
+        <h2><span class="step-tag">Step 06 · Family 380</span>06. 另一条战线：线性规划的极限与多胞体的“迷宫”</h2>
 
-        <p>
-          虽然你最关注的是那 7 篇张量几何论文，但为了完整理解 11 月 24 日发布的全部 9 篇内容，我们用工科《运筹学》的知识快速桥接最后 2 篇（Family 380）：
-        </p>
+        <div class="lesson-meta">
+          <div class="lesson-meta-item">
+            <strong>前置依赖</strong>
+            <span>本科《运筹学》线性规划标准型、单纯形法与多胞体顶点几何直观。</span>
+          </div>
+          <div class="lesson-meta-item">
+            <strong>本节目标</strong>
+            <span>理清 Family 380 两篇论文（Smale 第九问题 vs 多项式 Hirsch 猜想）之间的对照关系。</span>
+          </div>
+          <div class="lesson-meta-item warn">
+            <strong>关键联系</strong>
+            <span>Paper #9 证明“沿棱爬”必然存在几何长路；Paper #8 用“跳过沿棱的坐标缩放查询”绕开了它。</span>
+          </div>
+        </div>
 
         <div class="compare-pair">
           <div class="compare-box">
             <h4>Paper #8：强多项式线性规划（Smale 第九问题）</h4>
-            <p><strong>本科锚点</strong>：运筹学里的线性规划 $\max\{c^\top x : Ax \le b\}$，$A \in \mathbb{R}^{m\times n}$。Khachiyan 的椭球法和内点法虽然是“多项式时间”，但步数依赖于输入数字的<strong>二进制比特长度 $L$</strong>（系数写得越长，步数越多）。</p>
-            <p><strong>核心突破</strong>：Steve Smale 在 1998 年列出“21 世纪数学难题”时，第九问就是：是否存在<strong>强多项式时间（Strongly Polynomial）</strong>算法，其对任意实数输入的操作步数<strong>只取决于变量数 $n$ 和约束数 $m$ 的多项式</strong>，完全不随系数精度爆炸？</p>
-            <p><strong>怎么做到？</strong> 这篇论文把可行解和 Farkas 不可行证书放进一对正交子空间里。由于最小支撑证书里各个分量的比值可能相差 $2^T$ 倍（极小分量在普通精度下看不见），算法给每个坐标动态赋予一个缩放比例（论文里也叫“价格” $p_i$），再用校准压缩矩阵把极端的子行列式比值映射成普通有理数 LP 查询，逐一确定正负号与零分量，最终直接用线性代数拼出精确最优对偶解与证书。<em>（注：有理数输入的强多项式时间 RAM 程序已在 Lean 4 <code>LinearProgramming.lean</code> 中形式化。）</em></p>
+            <p><strong>痛点回顾</strong>：$\max\{c^\top x : Ax \le b\}$（$A \in \mathbb{R}^{m\times n}$）。椭球法与内点法的步数会随着输入数字的二进制长度 $L$ 变长而增加。Smale 第九问题追问：能不能只用关于 $m, n$ 的<strong>多项式步数</strong>（完全不看数字写多长）就求解任意实数线性规划？</p>
+            <p><strong>核心结论</strong>：论文给出了确定性<strong>强多项式时间算法</strong>（并推广至凸二次规划、单调 LCP 及平均收益博弈）。有理数版本已在 Lean 4 <code>LinearProgramming.lean</code> 形式化。</p>
+            <details class="deep-dive" style="margin-bottom:0;">
+              <summary>展开看：极小分量怎么探测？</summary>
+              <div class="dive-body">
+                <p>将原始可行解与 Farkas 不可行证书放进正交子空间对；通过动态改变各坐标的缩放比例（“价格” $p_i$）把极小分量放大，再用子行列式比值的短对数替代品校准成普通比特多项式 LP 查询，逐步确定证书的非零支撑集并用线性代数精确求根。</p>
+              </div>
+            </details>
           </div>
 
           <div class="compare-box">
-            <h4>Paper #9：简单多胞体的超多项式直径（推翻多项式 Hirsch 猜想）</h4>
-            <p><strong>本科锚点</strong>：线性规划的经典<strong>单纯形法（Simplex Method）</strong>，本质上是沿着可行域凸多胞体的“顶点和棱”一步步爬向最优点。1957 年 Hirsch 猜想一个有 $n$ 个面、$d$ 维的凸多胞体，任意两个顶点沿棱走最多只需 $n-d$ 步（Santos 在 2010 年给出了 43 维反例）。之后大家退而求其次问：至少是不是存在某个关于 $n$ 的<strong>多项式</strong>上界？（多项式 Hirsch 猜想）。</p>
-            <p><strong>核心突破</strong>：这篇论文构造出了一族显式的有界简单有理多胞体（$n$ 个面、维度仅为亚多项式 $n^{o(1)}$），其顶点-棱图的直径增长速度<strong>超过任意固定的 $n^k$ 多项式</strong>（$n^{\omega(1)}$），甚至哪怕允许每一步直接跨越维度 $\le s(n)=n^{o(1)}$ 的高维面也走不完！</p>
-            <p><strong>直觉</strong>：用线性目标 $x$ 当作“时间轴”，用多组折线型不等式 $z_i \ge |x - a|$ 强制路径在时间轴上不断弯折，再通过共用的“时钟读数”压缩不等式数量，把嵌套弯折层层相乘，使得少数约束就能强迫棱边路径长出超多项式级数目的拐点。<em>（注：该结论在 Lean 4 <code>Hirsch.lean</code> 中已给出形式化。）</em></p>
+            <h4>Paper #9：简单多胞体的超多项式图直径（否定多项式 Hirsch 猜想）</h4>
+            <p><strong>痛点回顾</strong>：经典单纯形法是沿着可行域凸多胞体的顶点和棱一步步走到最优解。1957 年 Hirsch 猜想 $n$ 个面、$d$ 维多胞体的最大顶点距离 $\le n-d$（Santos 2010 年给出 43 维反例）。之后大家猜想至少是否存在 $n$ 的<strong>多项式</strong>上界？</p>
+            <p><strong>核心结论</strong>：构造了 $n$ 个面、维度仅 $n^{o(1)}$ 的有界简单有理多胞体族，其图直径达到超多项式 $n^{\omega(1)}$（即使允许每步跨低维面跳跃亦然），<strong>彻底否定多项式 Hirsch 猜想</strong>，且主要定理已全面在 Lean 4 <code>Hirsch.lean</code> 形式化。</p>
+            <details class="deep-dive" style="margin-bottom:0;">
+              <summary>展开看：少量的面怎么逼出超多项式路程？</summary>
+              <div class="dive-body">
+                <p>以目标坐标 $x$ 为“时间轴”，用多组折线型下界 $z_i \ge |x - a|$ 强迫路径必须逐个拐弯，再借助共用“时钟读数”的调度器压缩约束个数，使嵌套层级的弯折数层层相乘，迫使任何沿棱行走（甚至允许跳小面）的步数超越一切固定多项式。</p>
+              </div>
+            </details>
           </div>
         </div>
-
-        <p>
-          把 Family 380 的两篇放在一起看极其耐人寻味：<strong>Paper #9 证明了沿多胞体表面棱边走路的单纯形策略存在几何死胡同（超多项式长路）；而 Paper #8 证明了跳过沿棱行走、直接从不等式正交子空间提取缩放符号的代数算法，却能以强多项式步数直达最优解！</strong>
-        </p>
       </section>
 
       <!-- SECTION 7: GLOSSARY & SOURCES -->
@@ -643,14 +781,19 @@
             </thead>
             <tbody>
               <tr>
-                <td>三维数组 / 三重求和公式</td>
-                <td>三阶张量（3-Tensor）与三条腿（Legs）</td>
-                <td>把 $A_{ij}B_{jk}C_{ki}$ 看成三角形三个顶点上的变量群组，共享下标就是连线。</td>
+                <td>$\operatorname{tr}(ABZ')$ 与基矩阵 $e_{ij}$</td>
+                <td>矩阵乘法张量 $T_n$ 与三条腿（Legs）</td>
+                <td>把 $n^2$ 条输出式子无损打包进 1 个三线性多项式，再读成三维 0-1 数组。</td>
               </tr>
               <tr>
                 <td>最少需要做几次独立乘法</td>
-                <td>张量秩 $R(T)$ / 渐近秩 / 边界秩</td>
-                <td>把高维数组拆成最少的“三方各自线性组合之积”之和；矩阵是二维秩，乘法是三维秩。</td>
+                <td>张量秩 $R(T)$ / 对角模板 $\Delta(r)$</td>
+                <td>把三维数组拆成最少的“三方各自线性组合外积”之和（Strassen 即 $R(T_2)\le 7$）。</td>
+              </tr>
+              <tr>
+                <td>乘法分配律归类提取</td>
+                <td>三个站点 $A,B,C$ 与三条导线 $I_n$</td>
+                <td>$T_n$ 严格分解为三角形三边各自一条单位阵 $I_n$ 的张量积。</td>
               </tr>
               <tr>
                 <td>分块对角阵 &amp; 克罗内克积</td>
@@ -658,39 +801,39 @@
                 <td>互不干扰的并行计算叫直和；把算法分块递归嵌套（放大规模）叫张量积。</td>
               </tr>
               <tr>
-                <td>矩阵秩满足单调、可加、可乘</td>
+                <td>矩阵展平的秩</td>
                 <td>Strassen 谱点 $F(T)$ 与价格 $H(T)=\log_2 F(T)$</td>
-                <td>给张量算力发明一套“汇率尺子”，取对数后放大规模（张量积）变成直接相加。</td>
+                <td>满足单调、直和可加、张量积可乘的“汇率尺子”，取对数后 $\otimes$ 变成相加。</td>
               </tr>
               <tr>
-                <td>向量距离 $\|u-v\|$ 与高斯投影</td>
+                <td>随机直线切中频率与投影宽度</td>
                 <td>欧氏价格与凸包平均宽度 $W(S)$</td>
-                <td>两点共享 1 比特的成本是欧氏距离；平面上多点共享 1 比特的成本是凸包周长的一半。</td>
+                <td>两点导线价格等于距离 $\|u-v\|$；平面上多点共享 1 比特等于凸包半周长 $P_{\text{hull}}/2$。</td>
               </tr>
               <tr>
                 <td>三角形无法拉高比值（恒为 2）</td>
                 <td>CAT(0) 非正曲率三叉戟（Tripod）</td>
-                <td>平面三角形半周长只能卡出 $\omega \ge 2$；必须进入三叉戟分支几何才能把比值拉到 $6/(8/3)=9/4$。</td>
+                <td>平面三角形半周长只能卡出 $\omega \ge 2$；三叉戟端距 $2$、共享费率 $8/3$ 才逼出 $9/4$。</td>
               </tr>
               <tr>
                 <td>$n\times n^t$ 乘 $n^t \times n$</td>
                 <td>长方形指数 $\omega(F; 1, 1, t)$ 与对偶指数 $\alpha=1/2$</td>
-                <td>内维宽度不超过 $\sqrt{n}$ 时，矩乘渐近代价“免费”保持在 $n^2$；超过 $1/2$ 后按二次曲线抬升至 $9/4$。</td>
+                <td>内维宽度不超过 $\sqrt{n}$ 时矩乘“免费”保持 $n^2$；超过 $1/2$ 后按二次曲线抬升至 $9/4$。</td>
               </tr>
               <tr>
-                <td>矩阵对角化 / 高斯消元 vs 没正负号</td>
+                <td>矩阵行列式 vs 去负号</td>
                 <td>Det（$\mathsf{VBP}$）vs Permanent（$\mathsf{VNP}$）</td>
-                <td>带正负号能大面积抵消所以好算；全正号的积和式与哈密顿回路必须付出超多项式代价。</td>
+                <td>有正负号可抵消所以好算；全正号的积和式与哈密顿回路必须付出超多项式代价。</td>
               </tr>
               <tr>
                 <td>Cooley–Tukey FFT（$N\log N$）</td>
                 <td>线性电路 DFT 对数指数 $1/2$（$N\sqrt{\log N}$）</td>
-                <td>在自由选择标量线性门的模型下，用二项集中+低次多项式预测奇偶性可省掉一半幂次的 $\log N$。</td>
+                <td>在自由标量线性门下，用二项集中+低次多项式预测奇偶性可把对数指数压到 $1/2$。</td>
               </tr>
               <tr>
                 <td>单纯形法沿棱找最优解</td>
                 <td>Hirsch 图直径 vs Smale 第九问题</td>
-                <td>沿着多胞体棱边走可能要走超多项式步；但通过坐标缩放（价格）查询子空间符号可以强多项式求解。</td>
+                <td>沿多胞体棱边走可能要走超多项式步；但通过坐标缩放查询子空间符号可强多项式求解。</td>
               </tr>
             </tbody>
           </table>
