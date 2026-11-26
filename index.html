@@ -105,60 +105,134 @@
 
       <!-- SECTION 1: LINEAR ALGEBRA TO TENSOR RANK -->
       <section id="sec-tensor-rank">
-        <h2><span class="step-tag">Step 1 · 大一线性代数起点</span>01. 从矩阵乘法到「张量秩」：乘法次数为什么变成几何问题？</h2>
+        <h2><span class="step-tag">Step 1 · 从 2×2 手推开始，零跳跃</span>01. 从矩阵乘法到「张量秩」：每一步在代数上到底发生了什么？</h2>
 
         <div class="note-block anchor">
           <span class="note-label">本科知识锚点</span>
-          <p>你已经熟悉大一《线性代数》里的矩阵乘法 $C = AB$：若 $A, B$ 都是 $n \times n$ 矩阵，则 $C_{ik} = \sum_{j=1}^n A_{ij} B_{jk}$。按定义直接算，每个元素做 $n$ 次乘法，共 $n^2$ 个元素，所以需要 $n^3$ 次标量乘法。</p>
+          <p>在大一《线性代数》里，两个 $2\times 2$ 矩阵 $A = \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix}$ 和 $B = \begin{pmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{pmatrix}$ 相乘得到 $C = AB$，其实就是把以下 4 条等式打包算出来：</p>
+          <div class="math-display">
+            $$c_{11} = a_{11}b_{11} + a_{12}b_{21}, \quad c_{12} = a_{11}b_{12} + a_{12}b_{22}$$
+            $$c_{21} = a_{21}b_{11} + a_{22}b_{21}, \quad c_{22} = a_{21}b_{12} + a_{22}b_{22}$$
+          </div>
+          <p>按定义直接算，每条式子做 2 次乘法，共需 $4 \times 2 = 8$ 次标量乘法。1969 年 Strassen 发现只需 7 次乘法。为了研究“最少几次乘法”，我们必须先解决一个技术问题：<strong>现在输出有 4 个式子（$n\times n$ 时有 $n^2$ 个式子），怎么把它们统一写成一个数学对象，好一起做代数变形？</strong></p>
         </div>
 
+        <h3>第一步：为什么引入辅助矩阵 $Z$？什么是“三线性型”？</h3>
         <p>
-          1969 年，Volker Strassen 发现了一个令人震惊的事实：计算两个 $2\times 2$ 矩阵相乘，其实不需要 $2^3 = 8$ 次乘法，<strong>只需要 7 次乘法</strong>（代价是多做几次加法）。因为分块矩阵递归会把 $n\times n$ 乘法的次数降到 $O(n^{\log_2 7}) \approx O(n^{2.807})$，于是人们定义<strong>矩阵乘法指数</strong> $\omega$ 为：把两个 $n\times n$ 矩阵相乘所需的算术运算次数大致是 $n^{\omega + o(1)}$ 时，那个最小的指数 $\omega$。显然 $2 \le \omega \le 3$（因为输出就有 $n^2$ 个数）。
-        </p>
-
-        <h3>把“矩阵乘法公式”翻译成三维数组（张量）</h3>
-        <p>
-          为什么“张量”会成为这七篇论文的主角？在工程和物理里，我们习惯把矩阵看成二维表格；而在代数复杂度理论里，一个<strong>三阶张量（3-tensor）</strong>不过是一个“三维数字魔方” $T_{u, v, w}$。
+          先复习本科一个熟悉的词——<strong>双线性型（Bilinear Form）</strong>。如果一个函数 $f(x, y) = \sum_{u,v} M_{uv} x_u y_v = x^\top M y$，固定 $y$ 它是 $x$ 的一次齐次线性函数，固定 $x$ 它是 $y$ 的一次齐次线性函数，这就叫“双线性型”。它的全部系数刚好排成一个<strong>二维矩阵 $M$</strong>。
         </p>
         <p>
-          为了把矩阵乘法 $C_{ik} = \sum_{j=1}^n A_{ij} B_{jk}$ 写成一个对称的三方结构，数学家引入一个辅助矩阵 $Z$ 去和结果 $C$ 做内积（也就是求 $\operatorname{tr}(ABZ)$）：
-        </p>
-
-        <div class="math-display">
-          $$T_n = \sum_{i=1}^n \sum_{j=1}^n \sum_{k=1}^n e_{ij} \otimes e_{jk} \otimes e_{ki} \qquad \Longleftrightarrow \qquad \text{三线性型 } \sum_{i,j,k=1}^n x_{ij}\, y_{jk}\, z_{ki}$$
-        </div>
-
-        <p>
-          别被记号 $\otimes$ 吓到，它在这里的意思极其朴素：<strong>把三组变量分开摆放</strong>。你可以把 $T_n$ 想象成房间里的三张桌子（论文里称作三条“腿” legs 或三个“站点” sites）：
-        </p>
-        <ul>
-          <li><strong>站点 $A$（输入1）</strong>：手里拿着变量 $x_{ij}$，它同时知道指标 $i$ 和 $j$；</li>
-          <li><strong>站点 $B$（输入2）</strong>：手里拿着变量 $y_{jk}$，它同时知道指标 $j$ 和 $k$；</li>
-          <li><strong>站点 $C$（输出对偶）</strong>：手里拿着变量 $z_{ki}$，它同时知道指标 $k$ 和 $i$。</li>
-        </ul>
-
-        <div class="note-block">
-          <span class="note-label">核心洞察 · 矩阵乘法就是“三角形连线”</span>
-          <p>
-            仔细看上面的指标配对：$i$ 只在 $A$ 和 $C$ 出现；$j$ 只在 $A$ 和 $B$ 出现；$k$ 只在 $B$ 和 $C$ 出现！如果把 $A, B, C$ 画成三角形的三个顶点，矩阵乘法张量 $T_n$ 恰好就是<strong>沿着三角形三条边各拉一根容量为 $n$ 的“数据线（Wire）”</strong>：
-          </p>
-          <p>
-            $$T_n = \underbrace{\Big(\sum_{i=1}^n e_i^{(A)} \otimes e_i^{(C)}\Big)}_{\text{边 } AC \text{ 上的导线 } i} \otimes \underbrace{\Big(\sum_{j=1}^n e_j^{(A)} \otimes e_j^{(B)}\Big)}_{\text{边 } AB \text{ 上的导线 } j} \otimes \underbrace{\Big(\sum_{k=1}^n e_k^{(B)} \otimes e_k^{(C)}\Big)}_{\text{边 } BC \text{ 上的导线 } k}$$
-          </p>
-        </div>
-
-        <h3>什么是张量秩（Tensor Rank）？</h3>
-        <p>
-          在大一线性代数里，矩阵 $M$ 的秩 $\operatorname{rank}(M) \le r$，意思是 $M$ 可以写成 $r$ 个“列向量 $\times$ 行向量”（即 $\sum_{\ell=1}^r u_\ell \otimes v_\ell$）之和。推广到三维张量，<strong>张量秩 $R(T)$</strong> 就是把 $T$ 写成最少的<strong>三方直积项</strong>之和的个数：
+          类似地，如果有三组变量 $x, y, z$，把每一组各挑一个变量乘起来再加权求和：
         </p>
         <div class="math-display">
-          $$T_n = \sum_{\ell=1}^r \underbrace{\Big(\sum_{i,j} \alpha_{ij}^{(\ell)} e_{ij}\Big)}_{\text{站点 }A\text{ 的线性组合}} \otimes \underbrace{\Big(\sum_{j,k} \beta_{jk}^{(\ell)} e_{jk}\Big)}_{\text{站点 }B\text{ 的线性组合}} \otimes \underbrace{\Big(\sum_{k,i} \gamma_{ki}^{(\ell)} e_{ki}\Big)}_{\text{站点 }C\text{ 的线性组合}}$$
+          $$P(x, y, z) = \sum_{u, v, w} T_{uvw}\, x_u\, y_v\, z_w$$
         </div>
         <p>
-          每一项 $\ell \in \{1, \dots, r\}$ 正好对应算法里的<strong>一次标量乘法</strong>（先在 $A$ 做线性组合，再在 $B$ 做线性组合，两者相乘一次，最后线性汇总到 $C$）。Strassen 算法之所以只需 7 次乘法，本质上就是证明了 $R(T_2) \le 7 < 8$！
+          固定任意两组变量，它对剩下那一组都是“一次齐次线性函数”，这就叫<strong>三线性型（Trilinear Form）</strong>。它的所有系数 $T_{uvw}$ 排成一个三维长方体数组，这就是数学家说的<strong>三阶张量 $T$</strong>。
         </p>
         <p>
-          更神奇的是右边的这串式子其实等同于“用 $r$ 个候选值的<strong>同一个公共标签 $\ell$</strong> 去同时发给 $A, B, C$ 三个站点”（然后再在各个站点本地做线性变换），这就是论文里说的<strong>对角张量（Diagonal Tensor）</strong> $\Delta_{\{A,B,C\}}(r) = \sum_{\ell=1}^r e_\ell \otimes e_\ell \otimes e_\ell$ 经过本地线性映射（Restriction）变出 $T_n$！
+          现在看矩阵乘法：输出矩阵 $C = AB$ 有 4 个元素 $c_{11}, c_{12}, c_{21}, c_{22}$。为了把这 4 条独立的等式<strong>无损打包进同一个三线性多项式里</strong>，我们引入 4 个“标记变量（或者叫对偶测试变量）” $z_{11}, z_{12}, z_{21}, z_{22}$，直接定义：
+        </p>
+        <div class="math-display">
+          $$P(A, B, Z) \;=\; c_{11} z_{11} + c_{12} z_{12} + c_{21} z_{21} + c_{22} z_{22}$$
+        </div>
+        <p>
+          把 $c_{ik}$ 的定义代入展开，这就是一个实实在在、一共 8 项的普通多项式：
+        </p>
+        <div class="math-display">
+          $$\begin{aligned}
+          P(A,B,Z) &= (a_{11}b_{11} + a_{12}b_{21})z_{11} + (a_{11}b_{12} + a_{12}b_{22})z_{12} \\
+                   &\quad + (a_{21}b_{11} + a_{22}b_{21})z_{21} + (a_{21}b_{12} + a_{22}b_{22})z_{22}
+          \end{aligned}$$
+        </div>
+        <p>
+          <strong>$Z$ 没有任何神秘物理意义，它就是一个“索引标签”</strong>：只要你把这个多项式算出来，想读输出矩阵左上角元素 $c_{11}$，只需看 $z_{11}$ 前面的系数；想读 $c_{21}$，只需看 $z_{21}$ 前面的系数！而且如果你把 $z_{ik}$ 顺手记作矩阵 $Z'$ 的转置位置 $z'_{ki} := z_{ik}$，那求的正好是矩阵乘积的迹 $\operatorname{tr}(ABZ') = \sum_{i,j,k} a_{ij} b_{jk} z'_{ki}$，这样指标的下标就会变成极其对称的循环 $ij \to jk \to ki$（这就是为什么论文写 $z_{ki}$ 而不是 $z_{ik}$）。
+        </p>
+
+        <h3>第二步：式子里的 $e_{ij}$ 和 $\otimes$ 到底是什么意思？</h3>
+        <p>
+          在 $2\times 2$ 矩阵空间里，有 4 个最简单的<strong>标准基矩阵</strong>，每个矩阵只在 $(i,j)$ 位置写一个 $1$，其余三个位置全写 $0$：
+        </p>
+        <div class="math-display">
+          $$e_{11} = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}, \quad e_{12} = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}, \quad e_{21} = \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}, \quad e_{22} = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}$$
+        </div>
+        <p>
+          回忆本科线性代数：如果 $u$ 是 4 维列向量、$v$ 是 4 维列向量，那么 $u \otimes v$（在二维情况下就是外积 $u v^\top$）会拼成一个 $4\times 4$ 矩阵，第 $(p,q)$ 格等于 $u_p v_q$。特别地，$e_p \otimes e_q$ 就是“只在第 $(p,q)$ 格为 $1$、其余全为 $0$”的矩阵。
+        </p>
+        <p>
+          完全一样！把 3 个基矩阵 $e_{ij}, e_{jk}, e_{ki}$ 用 $\otimes$ 连起来：
+        </p>
+        <div class="math-display">
+          $$e_{ij} \otimes e_{jk} \otimes e_{ki}$$
+        </div>
+        <p>
+          这代表一个 $4 \times 4 \times 4$ 的三维数组（共 64 个格子），<strong>仅仅在坐标为 $\bigl((i,j),\,(j,k),\,(k,i)\bigr)$ 的那一个格子里填 $1$，其余 63 个格子全填 $0$</strong>！
+          它和刚才的多项式单项式 $a_{ij} b_{jk} z'_{ki}$ 是一一对应的——多项式里出现哪几项，三维数组就在那几个坐标上填 $1$。因此：
+        </p>
+        <div class="math-display">
+          $$T_2 = \sum_{i,j,k \in \{1,2\}} e_{ij} \otimes e_{jk} \otimes e_{ki}$$
+        </div>
+        <p>
+          说的不过是“<strong>一个 $4\times 4\times 4$ 的三维数组，在 8 个合法坐标上写 $1$，其余 56 个坐标写 $0$</strong>”。（一般地，$T_n$ 是 $n^2 \times n^2 \times n^2$ 维三维数组中、有 $n^3$ 个 $1$ 的稀疏 0-1 数组。）
+        </p>
+
+        <h3>第三步：手推验证——为什么 Strassen 的 7 次乘法就是“张量秩 = 7”？</h3>
+        <p>
+          如果按定义展开，上面 $P(A,B,Z)$ 有 8 个单项式，对应三维数组写成 8 个“单点阵”之和。现在看一个具体操作——比如 Strassen 著名的第一项乘法 $M_1 = (a_{11}+a_{22})(b_{11}+b_{22})$，它同时加到了 $c_{11}$ 和 $c_{22}$ 上。在带标签 $Z$ 的多项式里，这一项的贡献恰好能<strong>因式分解成三个一次式的乘积</strong>：
+        </p>
+        <div class="math-display">
+          $$(a_{11} + a_{22})\,(b_{11} + b_{22})\,(z_{11} + z_{22})$$
+        </div>
+        <p>
+          写成三维数组语言，它对应唯一一个“三方外积”：
+        </p>
+        <div class="math-display">
+          $$(e_{11} + e_{22}) \otimes (e_{11} + e_{22}) \otimes (e_{11} + e_{22})$$
+        </div>
+        <p>
+          请注意它的结构：<strong>左边只混用 $A$ 的元素，中间只混用 $B$ 的元素，右边只决定结果加到 $C$ 的哪些位置</strong>！Strassen 找出了 7 组这样的括号：
+        </p>
+        <div class="math-display">
+          $$P(A, B, Z) = \sum_{\ell=1}^{7} \Big(\sum_{i,j} \alpha_{ij}^{(\ell)} a_{ij}\Big) \Big(\sum_{j,k} \beta_{jk}^{(\ell)} b_{jk}\Big) \Big(\sum_{i,k} \gamma_{ik}^{(\ell)} z_{ik}\Big)$$
+        </div>
+        <p>
+          我们把“<strong>最多只允许写成几个 $u_\ell \otimes v_\ell \otimes w_\ell$ 之和</strong>”定义为张量秩 $R(T)$。把三维数组拆成 7 个这种可因式分解的块，与设计一个只需 7 次乘法的双线性矩阵乘法算法，<strong>在数学上是同一件事的两个写法</strong>，所以 $R(T_2) \le 7$（事实上可以严格证明正好等于 7）。
+        </p>
+        <p>
+          而论文里常出现的记号 $\Delta_{\{A,B,C\}}(r) = \sum_{\ell=1}^r e_\ell \otimes e_\ell \otimes e_\ell$，对应多项式就是 $\sum_{\ell=1}^r \tilde{a}_\ell \tilde{b}_\ell \tilde{z}_\ell$——即“<strong>做 $r$ 次完全独立互不相干的乘法</strong>”。只要我们在 $A$ 处做线性替换 $\tilde{a}_\ell \leftarrow \sum \alpha_{ij}^{(\ell)} a_{ij}$、在 $B$ 处做 $\tilde{b}_\ell \leftarrow \sum \beta_{jk}^{(\ell)} b_{jk}$、在 $C$ 处做对应线性映射，就能把这 $r$ 次独立乘法变成 $T_n$。这就是为什么论文把算法等价于“局部线性映射（Restriction）把 $\Delta(r)$ 变成 $T_n$”，记作 $T_n \le \Delta_{\{A,B,C\}}(r)$。
+        </p>
+
+        <h3>第四步：为什么偏要理解成“三个站点”和“三条导线”？（不是玄学比喻，是严格代数分解）</h3>
+        <p>
+          很多工科同学读到这里会卡住：“行，三维数组我懂了，但论文里动不动就说把张量放在‘三个站点（Sites）’、边上是‘导线（Wire）’，这到底有什么严格意义？”
+        </p>
+        <p>
+          <strong>第一，为什么叫“三个站点 $A, B, C$”？</strong> 因为做张量秩分解时，算法允许你把 $A$ 里面的元素任意加减组合（$a_{11}+a_{22}$），把 $B$ 里面的元素任意加减组合（$b_{11}+b_{22}$），但<strong>绝对不允许把 $a_{11}$ 和 $b_{11}$ 加在一起做线性替换</strong>（如果允许混合，乘法就变成平方公式 $(a+b)^2 - a^2 - b^2$ 乱套了）。把 $A, B, C$ 想象成物理隔离的三张桌子（三个站点），恰好用几何隔离强制执行了那条代数规则：“<strong>每个站点内部只能做自己的线性变换（Local Linear Map）</strong>”。
+        </p>
+        <p>
+          <strong>第二，什么叫“导线（Wire）”？</strong> 在线性代数里，最简单的线性算子是单位矩阵 $I_n = \sum_{j=1}^n e_j \otimes e_j$。把它当成双线性型，就是 $\sum_{j=1}^n x_j y_j$。为什么论文管 $I_n$ 叫“一条容量为 $n$ 的导线”？看两件事：
+        </p>
+        <ol>
+          <li>当作系数矩阵看：只有当两边选的下标完全相等（$j_{\text{左}} = j_{\text{右}}$）时，系数才是 $1$，否则全为 $0$——它强制让两个站点对齐同一个 $n$ 选 $1$ 的指标；</li>
+          <li>当作缩并运算看：把一根导线接在某个变量上求和 $\sum_{j=1}^n x_j (\delta_{j, j'})$，结果原封不动输出 $x_{j'}$——它把信息从一端无损搬运到另一端，就像电线一样。</li>
+        </ol>
+        <p>
+          <strong>第三，手推一遍那个“三角形三边分解公式”！</strong> 把基矩阵 $e_{ij}^{(A)}$ 进一步看成行向量与列向量的外积 $e_i^{(A_1)} \otimes e_j^{(A_2)}$（同样 $e_{jk}^{(B)} = e_j^{(B_1)} \otimes e_k^{(B_2)}$，$e_{ki}^{(C)} = e_k^{(C_1)} \otimes e_i^{(C_2)}$）。现在看原封不动的三重求和：
+        </p>
+        <div class="math-display">
+          $$T_n = \sum_{i=1}^n \sum_{j=1}^n \sum_{k=1}^n \bigl(e_i^{(A_1)} \otimes e_j^{(A_2)}\bigr) \otimes \bigl(e_j^{(B_1)} \otimes e_k^{(B_2)}\bigr) \otimes \bigl(e_k^{(C_1)} \otimes e_i^{(C_2)}\bigr)$$
+        </div>
+        <p>
+          中学数学教过我们乘法分配律：$\sum_i \sum_j \sum_k (u_i v_j w_k) = (\sum_i u_i)(\sum_j v_j)(\sum_k w_k)$！只要把带相同下标 $i, j, k$ 的因子各自归类并合到一起（重新排一下张量积括号顺序），上面的三重求和<strong>严格地、不带任何比喻地</strong>因式分解成三块完全独立的东西：
+        </p>
+        <div class="math-display">
+          $$T_n \;\cong\; \underbrace{\Big(\sum_{i=1}^n e_i^{(A_1)} \otimes e_i^{(C_2)}\Big)}_{\text{连接 }A\text{ 与 }C\text{ 的单位阵 } I_n} \;\otimes\; \underbrace{\Big(\sum_{j=1}^n e_j^{(A_2)} \otimes e_j^{(B_1)}\Big)}_{\text{连接 }A\text{ 与 }B\text{ 的单位阵 } I_n} \;\otimes\; \underbrace{\Big(\sum_{k=1}^n e_k^{(B_2)} \otimes e_k^{(C_1)}\Big)}_{\text{连接 }B\text{ 与 }C\text{ 的单位阵 } I_n}$$
+        </div>
+        <p>
+          在 $n=2$ 的小例子里检验一下：$(e_1\otimes e_1 + e_2\otimes e_2)_{AC} \otimes (e_1\otimes e_1 + e_2\otimes e_2)_{AB} \otimes (e_1\otimes e_1 + e_2\otimes e_2)_{BC}$ 展开括号一共 $2\times 2\times 2 = 8$ 项，每一项 $(i, j, k)$ 正好选出 $e_{ij}^{(A)}\otimes e_{jk}^{(B)} \otimes e_{ki}^{(C)}$！
+        </p>
+        <p>
+          至此你已经彻底打通了核心翻译：<strong>矩阵乘法张量 $T_n$，在代数上真真切切就是三个两两独立单位阵 $I_n$ 的张量积——对应三角形三条边上各自拉一根 $n$ 维导线；而一次求矩阵乘法的算法，就是试图用一根同时贯穿三点的“总公共总线 $\Delta(r)$”去替代这三条两两导线！</strong>
         </p>
 
         <details class="deep-dive">
@@ -224,7 +298,10 @@
           于是立刻白白白捡到一个铁打的不等式：$3 \log_2 n \le D \log_2 r \implies r \ge n^{3/D}$！
         </p>
         <p>
-          <strong>痛点在哪里？</strong>几十年来，数学家手里只有极少数几个现成的谱点——比如把三个站点切成两半（$A$ 对 $BC$），算<strong>展平矩阵的秩（Flattening Rank）</strong>。按这种粗暴切法，任何一条跨切口的导线单价是 1，不跨切口单价是 0，算出来只能证明平庸的下界 $r \ge n^2$（即 $\omega \ge 2$）。人们根本不知道在一般的域上还存在什么更精细、更丰富的谱点 $F$！
+          <strong>痛点在哪里？怎样手动算一次经典“谱点”？</strong>几十年来，数学家手里最常用的一类现成谱点叫做<strong>展平矩阵秩（Flattening Rank）</strong>。不妨直接在 $T_2$ 上动手算一遍：把站点 $A$ 的 4 个基坐标 $\{e_{11}, e_{12}, e_{21}, e_{22}\}$ 当作矩阵的行，把站点 $(B, C)$ 凑成的 $4\times 4 = 16$ 对坐标当作矩阵的列。因为 $T_2 = \sum_{i,j,k} e_{ij} \otimes (e_{jk}\otimes e_{ki})$ 中，每一行 $(i,j)$ 对应的非零列 $(jk, ki)$ 互不重叠，所以这个 $4\times 16$ 展平矩阵恰好有 4 个线性无关的行——<strong>秩等于 $4 = 2^2$</strong>（对任意 $n$ 则等于 $n^2$）。
+        </p>
+        <p>
+          检验一下它是否满足三条公理：两个展平矩阵直和变成块对角阵，秩相加；张量积变成 Kronecker 积，秩相乘；各站点做线性映射等价于左乘右乘矩阵，秩不增。所以“按 $A$ vs $(B,C)$ 切一刀算矩阵秩”确实是一个合法谱点 $F_{A|BC}$！在这个谱点下：跨切口的导线 $AB$（2 维）和 $AC$（2 维）的矩阵秩都是 $2$（单价 $\log_2 2 = 1$），不跨切口的 $BC$ 矩阵秩是 $1$（单价 $\log_2 1 = 0$），而三方公共标签 $\Delta(r)$ 跨切口秩是 $r$（总价 $\log_2 r$）。于是它能证明 $2 \log_2 n \le \log_2 r \implies r \ge n^2$——<strong>但也就到此为止了，只能证明平庸的 $\omega \ge 2$</strong>。人们在几十年里始终不知道一般域上还有什么能绕开这种粗暴切法的谱点！
         </p>
       </section>
 
@@ -263,12 +340,21 @@
         </div>
 
         <p>
-          请花 5 秒钟感受一下这个定理有多美！它相当于在“代数复杂度的黑暗森林”里直接架设了一套 GPS 坐标：
+          请花 10 秒钟从高数积分直觉上看看<strong>为什么会有“距离”和“平均宽度”？</strong>（这是原论文第 1 节特意给出的直觉解释）：
         </p>
         <ul>
-          <li>如果把同一个比特发给三角形的三个顶点（一个 3-way 共享变量 $\ell$），它只要付“半周长” $(a+b+c)/2$ 的价格；</li>
-          <li>如果三条边各自传输三个独立的比特（正如矩阵乘法 $T_n$ 的 $(i, j, k)$），总价格是三条边长之和 $a+b+c$；</li>
-          <li>如果你要在三角形内部加一个中继点 $z$，只要 $z$ 落在三角形凸包里面（甚至就在边上），凸包不变，平均宽度 $W(S\cup\{z\}) = W(S)$，<strong>额外价格为零</strong>！</li>
+          <li>把点集 $S$ 放在平面上，任选一条随机直线像切西瓜一样把平面切成两半，计算切口处的“展平矩阵秩”的对数 $\log_2(\text{rank})$：
+            <ul>
+              <li>对于一条连接 $u, v$ 的 1 比特导线：如果随机直线把 $u$ 和 $v$ 切在两边，秩是 $2$（贡献 $\log_2 2 = 1$）；切在同一边，秩是 $1$（贡献 $\log_2 1 = 0$）。在微积分几何概率（Crofton 公式）里，随机直线切中线段 $uv$ 的频率<strong>正比于欧氏距离 $\|u-v\|$</strong>！</li>
+              <li>对于三方共享 1 比特的 $\Delta_S(2)$：只要直线穿过三角形凸包（即没有把三个点全留在同一侧），切口两边就都分到了点，秩就是 $2$（贡献 $1$）。对各个投影方向做积分平均，这个宽度区间长度的期望恰好就是<strong>凸包归一化平均宽度 $W(S)$（在平面上即半周长 $P/2$）</strong>！</li>
+            </ul>
+          </li>
+          <li><strong>真正的难点与突破在哪里？</strong> 既然随机切一刀求几何平均就能得到“距离”和“半周长”，为什么以前没人这么做？因为<strong>“谱点的几何平均”会破坏直和可加性！</strong>
+            <div class="note-block caution" style="margin-top:0.65rem;">
+              <span class="note-label">原论文亲手给出的反例：为什么简单的“平均切法”行不通？</span>
+              <p>把正方形四个角用横竖两条中线切开。令 $U$ 是一条水平导线，$V$ 是一条竖直导线。它们在横竖两刀下的秩分别是 $(2, 1)$ 和 $(1, 2)$，几何平均都是 $\sqrt{2\cdot 1} = \sqrt{2}$。但把它们直和 $U \oplus V$ 之后，横竖两刀下的秩都变成了 $2+1=3$，几何平均是 $\sqrt{3\cdot 3} = 3$，而不是直和可加性要求的 $\sqrt{2}+\sqrt{2} = 2\sqrt{2} \approx 2.828$！因此，第一篇论文真正的硬核突破，是<strong>在任意域上把这组几何距离真正延拓成了对“所有张量”都严格满足直和可加、张量积可乘、局部线性映射不增的合法谱点</strong>！</p>
+            </div>
+          </li>
         </ul>
 
         <!-- Interactive Widget 2: Euclidean Tensor Geometry Lab -->
@@ -331,7 +417,7 @@
           从 1986 年到 2026 年初，整整四十年里，大家一直沿着 Coppersmith–Winograd（CW）张量的“激光法（Laser Method）”一点点抠小数点，从 $2.3755$ 抠到 $2.371177$。2026 年 10 月 2 日 OpenAI 发布的上界论文（随后 Amanov–van den Berg–Zuiddam 等人推广至任意域），换了一块完全不同的跳板：<strong>普通多项式乘法（Polynomial Multiplication）</strong>！
         </p>
         <p>
-          把长度分别为 $a$ 和 $b$ 的两个系数向量做多项式乘法，输出长度是 $a+b-1$。虽然一次多项式乘法用 FFT 看起来很容易，但论文反过来研究“在 Strassen 谱点（Tensor Characters）眼中，多项式乘法张量的‘几何平均轮廓’ $P(a, b)$ 随 $a, b$ 增大的增长速度”：
+          把两个多项式 $(p_0 + p_1 x + \dots + p_{a-1}x^{a-1})(q_0 + q_1 x + \dots + q_{b-1}x^{b-1})$ 相乘（例如 $a=b=2$ 时，$(p_0+p_1 x)(q_0+q_1 x) = p_0 q_0 + (p_0 q_1 + p_1 q_0)x + p_1 q_1 x^2$，输入长度都是 $2$，输出长度是 $3$），写成三线性型也是一个张量。虽然一次多项式乘法用 FFT 看起来很容易，但论文反过来研究“在 Strassen 谱点眼中，多项式乘法张量的‘几何平均轮廓’ $P(a, b)$ 随 $a, b$ 增大的增长速度”：
         </p>
         <ul>
           <li>通过一个精妙的<strong>局部退化（Separation Degeneration）</strong>和三段分解，证明了 $P(a, 3h+a-1) \ge 3 P(a, h)$，再加上递增凹性，硬生生逼出了对称情况下的下界 $P(a, a) \ge a^{4/3}$；</li>
@@ -458,7 +544,9 @@
           <p>在算法课里我们学过：有些多项式很容易写成括号嵌套的公式（Formula），有些适合用分层状态转移图来算（代数分支程序 ABP，比如矩阵连乘），更一般的是允许复用中间结果的电路（Circuit，对应 $\mathsf{VP}$），而 $\mathsf{VNP}$ 则允许对指数多个“布尔见证变量”求和（对应难算的 NP 类代数版本）。</p>
         </div>
         <p>
-          这篇论文直接用同一个极其简洁的模板——<strong>图上的状态和（State Sum）</strong> $Z_{G,q}(X) = \sum_{a \in [q]^E} \prod_{v\in V} X_{v, a|_{E(v)}}$——一次性把四层代数复杂度类全部严格分开！做法优雅得像魔术：
+          这篇论文直接用同一个极其简洁的模板——<strong>图上的状态和（State Sum）</strong> $Z_{G,q}(X) = \sum_{a \in [q]^E} \prod_{v\in V} X_{v, a|_{E(v)}}$——一次性把四层代数复杂度类全部严格分开！先看一个最小例子感受一下它是什么：如果图 $G$ 是一条只有 3 个顶点、2 条边的路径（$v_1 \stackrel{i}{\text{—}} v_2 \stackrel{j}{\text{—}} v_3$），每条边取 $q$ 个状态，那它的状态和就是
+          $$Z_{\text{path}_3, q}(X) = \sum_{i=1}^q \sum_{j=1}^q x_i\, Y_{ij}\, z_j = x^\top Y z$$
+          ——就是本科线性代数的“行向量 $\times$ 矩阵 $\times$ 列向量”！如果把路径拉长到 $n$ 个顶点，就变成 $n$ 个矩阵连乘；放到二叉树上，就变成从树叶到树根的自底向上树状收缩；放到 $n\times n$ 网格上，就变成二维张量网络缩并（即 $\mathsf{VNP}$ 类）。做法优雅得像魔术：
         </p>
         <ul>
           <li><strong>把图每条边的两个端点，放在欧氏空间一条专属坐标轴的正负单位向量上</strong>。此时图张量的总价格正好等于所有边长之和。</li>
@@ -468,7 +556,7 @@
 
         <h3>2. 有向哈密顿回路与积和式（Permanent）电路下界</h3>
         <p>
-          矩阵的行列式（Det）有加减正负号抵消，所以 $O(n^3)$ 高斯消元就能算出来；把正负号全变成 $+1$ 就成了<strong>积和式（Permanent, $\operatorname{Per}_N$）</strong>，这是 $\mathsf{VNP}$-完全的代表难题（除非域特征为 2，此时 $-1=+1$ 二者重合）。
+          对于 $2\times 2$ 矩阵 $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$，行列式是 $ad - bc$，积和式是 $ad + bc$。行列式（Det）因为有加减正负号抵消，所以 $O(n^3)$ 高斯消元就能算出来；把所有负号全抹成 $+1$ 就成了<strong>积和式（Permanent, $\operatorname{Per}_N = \sum_{\pi} \prod_{i=1}^N X_{i,\pi(i)}$）</strong>，它计算所有有向圈覆盖的权重和，是 $\mathsf{VNP}$-完全的代表难题（除非域特征为 2，此时 $-1=+1$ 二者重合）。
         </p>
         <p>
           这篇论文证明了在任意域上，有向哈密顿回路多项式（及特征 $\ne 2$ 时的 $\operatorname{Per}_N$）的度分量边界电路规模至少达到 $\exp\bigl(c(\log N)^2 / (\log\log N)^2\bigr)$。它的证明把特征按几何性质一分为二：若该域的导线度量空间支持有界度扩展图（Port expansion），就用“压缩模拟自身计数”的逻辑对角线矛盾；若不支持扩展图，就利用反方向的熵不等式挑出一个精妙摆放位置，让外部积张量（Minor tensors）的价格直接压倒小电路！
@@ -500,7 +588,7 @@
 
         <h3>5. 固定花瓣数的向日葵猜想（Erdős–Rado Sunflower Conjecture）</h3>
         <p>
-          如果一组集合中任意两个集合的交集都完全相同，像向日葵的花盘（Core）和互不相交的花瓣（Petals），就叫一个 $r$-向日葵。1960 年 Erdős 和 Rado 猜想：只要集合元素个数不超过 $k$ 且没有 $r$-向日葵，集合总数就最多是 $B_r^k$（底数 $B_r$ 只与花瓣数 $r$ 有关，与 $k$ 无关）。经典做法只能得到 $k!(r-1)^k$，近年 Alweiss 等人突破到了 $(C r \log(rk))^k$，但仍残留 $\log k$ 因子。
+          如果一组集合中任意两个集合的交集都完全相同——例如 $\{a,b,c\}, \{a,d,e\}, \{a,f,g\}$ 任意两两相交都是 $\{a\}$，像向日葵共同的花盘（Core $\{a\}$）和互不相交的花瓣（Petals $\{b,c\}, \{d,e\}, \{f,g\}$）——就叫一个 $3$-向日葵。1960 年 Erdős 和 Rado 猜想：只要集合元素个数不超过 $k$ 且没有 $r$-向日葵，集合总数就最多是 $B_r^k$（底数 $B_r$ 只与花瓣数 $r$ 有关，与 $k$ 无关）。经典做法只能得到 $k!(r-1)^k$，近年 Alweiss 等人突破到了 $(C r \log(rk))^k$，但仍残留 $\log k$ 因子。
         </p>
         <p>
           这篇文章把集合家族的 $k$ 个坐标编码成单词，把 $r$ 组词放到欧氏空间的不同站点群。当这 $r$ 组词不存在向日葵时，在每个坐标列上用张量滤波器淘汰掉“部分重复（partial repetition）”——于是 $r$ 组原本独立的标签被迫坍缩成<strong>全组共享的同一个标签</strong>！欧氏凸包平均宽度定理立即给出“独立变共享”必须支付至少 $\rho \log_2 N$ 的价格，只要单列过滤器的净代价不超过一个与字母表大小无关的常数 $f$，直接就得出 $\rho \log_2 N \le k f \implies N \le B_r^k$，其中 $\log_2 B_r = O((\log r)^4 (\log\log(2r))^{5/2})$！
